@@ -3,8 +3,13 @@ from tkinter import *
 from tkinter import ttk
 from PIL import ImageTk, Image
 import matplotlib.pyplot as plt
-from scipy. integrate import odeint
 import numpy as np
+
+from matplotlib.backends.backend_tkagg import (
+    FigureCanvasTkAgg, NavigationToolbar2Tk)
+# Implement the default Matplotlib key bindings.
+from matplotlib.backend_bases import key_press_handler
+from matplotlib.figure import Figure
 
 def create_image_for_model(pass_obj, k_size):
     buff_image = ImageTk.PhotoImage(Image.open(pass_obj))
@@ -214,3 +219,23 @@ class Base_model:
                     if (i != "not exist"):
                         i.delete_wire()
             self.list_wires = ["not exist"] * len(self.list_nodes)
+
+    def view_results(self):
+        for i in range(math.ceil(len(self.list_results)/4)):
+            root_graph = Toplevel(self.root)
+            root_graph.title("Выбор моделей")
+
+            if (i == (math.ceil(len(self.list_results)/4) - 1)):
+                number_of_gr = len(self.list_results) - 4 * i
+            else:
+                number_of_gr = 4
+
+            fig = Figure(figsize=(15, 10), dpi=100)
+
+            for j in range(number_of_gr):
+                fig.add_subplot(221 + j).plot(self.t, self.list_results[4*i + j])
+
+            canvas = FigureCanvasTkAgg(fig, master=root_graph)  # A tk.DrawingArea.
+            canvas.draw()
+            canvas.get_tk_widget().pack(side = TOP, fill = BOTH, expand=1)
+

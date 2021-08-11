@@ -15,7 +15,7 @@ coord = [
     [[171, 981]]
 ]
 
-list_nodes = ["Q"]
+list_nodes = ["Q:ON_SWITCH"]
 
 class Electrical_System(Base_model):
 
@@ -23,3 +23,49 @@ class Electrical_System(Base_model):
 
         Base_model.__init__(self, init_x, init_y, canv, root, "Image/Electrical System/", coord, 0, list_nodes)
 
+        ###
+        self.Uc = 6060
+        self.fc = 50
+        self.phic = 0
+        self.Lc = 0.02/(314.15)
+
+        self.width_input = len(self.get_first())
+        self.width_matrix = len(self.get_main_determinant(self.get_first(), 0)[0])
+        self.height_matrix = len(self.get_main_determinant(self.get_first(), 0))
+
+    def get_first(self):
+        return ([0, 0, 0])
+
+    def get_main_determinant(self, input_variable, t):
+        main_determinant = [[-self.Lc, self.Lc, 0],
+                            [0, -self.Lc, self.Lc],
+                            [0, 0, -self.Lc]
+                            ]                           
+        return main_determinant
+
+    def get_own_matrix(self, input_variable, t):
+        own_matrix = [self.Uc*math.sqrt(2)*math.sin(2*math.pi*self.fc*t + 0 + self.phic) - self.Uc*math.sqrt(2)*math.sin(2*math.pi*self.fc*t - 2*math.pi/3 + self.phic),
+                    self.Uc*math.sqrt(2)*math.sin(2*math.pi*self.fc*t - 2*math.pi/3 + self.phic) - self.Uc*math.sqrt(2)*math.sin(2*math.pi*self.fc*t + 2*math.pi/3 + self.phic),
+                    self.Uc*math.sqrt(2)*math.sin(2*math.pi*self.fc*t + 2*math.pi/3 + self.phic)
+                    ]  
+        return own_matrix
+    
+    def get_voltage_matrix(self, parameter):
+        if (parameter == "Q"):
+            voltage_matrix = [[1, 0, 0],
+                        [0, 1, 0],
+                        [0, 0, 1],
+                        ] 
+            return voltage_matrix
+
+    def get_current_matrix(self, parameter):
+        if (parameter == "Q"):
+            current_matrix = [[-1, 0, 0],
+                        [0, -1, 0],
+                        [0, 0, -1],
+                        ] 
+            return current_matrix
+
+    def get_additional_variable(self, input_variable, t):
+        additional_variable = []
+        return additional_variable

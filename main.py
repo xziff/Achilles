@@ -1,6 +1,7 @@
 from tkinter import *
 import tkinter.font as font
 from tree_window import get_tree_window, add_model
+from calc import calculations
 
 #Массив узлов
 list_nodes = []
@@ -72,12 +73,20 @@ def rotation(event):
             if (j != "Deleted"):
                 j.rotation(event.x, event.y)
 
-
 def get_list_nodes(event):
     print("#####################################################")
     for i in list_nodes:
         print(i.list_connection)
     print("#####################################################")
+
+def start(event):
+    calculations(list_nodes, list_models)
+
+def view(event):
+    for i in list_models:
+        for j in i:
+            if (j != "Deleted"):
+                j.view_results()
 
 # Создание главного окна
 root = Tk()
@@ -116,6 +125,8 @@ b1.pack(side = LEFT, padx = 10)
 canv.bind('<Button-1>', click_1)
 canv.bind('<Motion>', mouse_motion)
 
+root.bind('s', start)
+root.bind('v', view)
 root.bind('r', rotation)
 root.bind('n', get_list_nodes)
 
