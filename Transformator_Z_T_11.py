@@ -17,9 +17,11 @@ coord = [
 
 list_nodes = ["Z", "T"]
 
+list_graph = [0, 2, 3]
+
 class Transformator_Z_T_11(Base_model):
 
     def __init__(self, init_x, init_y, canv, root):
 
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/Transformator/", coord, 0, list_nodes)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/Transformator/", coord, 0, list_nodes, list_graph)
 

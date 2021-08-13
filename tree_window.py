@@ -9,17 +9,29 @@ from Electrical_System import Electrical_System
 
 def add_model(mass_model, list_nodes, return_text, WIDTH, HEIGHT, canv, root):
     if (return_text == "Обычный узел"):
-        list_nodes.append(Electrical_Bus(WIDTH/2, HEIGHT/2, canv, root))
-    elif (return_text == "Звезда-треугольник-11"):
-        mass_model[0].append(Transformator_Z_T_11(WIDTH/2, HEIGHT/2, canv, root))
-    elif (return_text == "Синхронная машина"):
-        mass_model[1].append(SM(WIDTH/2, HEIGHT/2, canv, root))
-    elif (return_text == "Асинхронная машина"):
-        mass_model[2].append(AM(WIDTH/2, HEIGHT/2, canv, root))
-    elif (return_text == "Система"):
-        mass_model[3].append(Electrical_System(WIDTH/2, HEIGHT/2, canv, root))
+        list_nodes.append(Electrical_Bus(WIDTH, HEIGHT, canv, root))
+        list_nodes[-1].state_click = 1
+        list_nodes[-1].delta_x = list_nodes[-1].image_width/2
+        list_nodes[-1].delta_y = list_nodes[-1].image_height/2
     else:
-        print("Error")
+        if (return_text == "Звезда-треугольник-11"):
+            m_i = 0
+            mass_model[0].append(Transformator_Z_T_11(WIDTH, HEIGHT, canv, root))
+        elif (return_text == "Синхронная машина"):
+            m_i = 1
+            mass_model[1].append(SM(WIDTH, HEIGHT, canv, root))
+        elif (return_text == "Асинхронная машина"):
+            m_i = 2
+            mass_model[2].append(AM(WIDTH, HEIGHT, canv, root))
+        elif (return_text == "Система"):
+            m_i = 3
+            mass_model[3].append(Electrical_System(WIDTH, HEIGHT, canv, root))
+        else:
+            print("Error")
+        mass_model[m_i][-1].state_click = 1
+        mass_model[m_i][-1].delta_x = mass_model[m_i][-1].image_width/2
+        mass_model[m_i][-1].delta_y = mass_model[m_i][-1].image_height/2
+        mass_model[m_i][-1].click_indication = canv.create_rectangle(mass_model[m_i][-1].x, mass_model[m_i][-1].y, mass_model[m_i][-1].x + mass_model[m_i][-1].image_width, mass_model[m_i][-1].y + mass_model[m_i][-1].image_height, width = 2, outline = "red")
 
 
 

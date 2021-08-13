@@ -122,7 +122,8 @@ class Wire:
 
 class Base_model:
 
-    def __init__(self, init_x, init_y, canv, root, path_to_image_model, dxdy, position, list_nodes):
+    def __init__(self, init_x, init_y, canv, root, path_to_image_model, dxdy, position, list_nodes, list_graph):
+        self.list_graph = list_graph
         self.list_nodes = list_nodes
         self.canv = canv
         self.root = root
@@ -149,6 +150,10 @@ class Base_model:
         self.state_click = 0 #
         self.k_click = 0.0 #
         self.quad_indication_create = False #
+        self.data_type = np.float64
+
+    #def __del__(self):
+    #    print("111111")
 
     def set_state_click(self, m_x, m_y):
         if ((m_x >= self.x + self.k_click*self.image_width) and (m_x <= self.x + self.image_width - self.k_click*self.image_width) and (m_y >= self.y + self.k_click*self.image_height) and (m_y <= self.y + self.image_height - self.k_click*self.image_height) and (self.bool_mouse_in_area == False)):
@@ -160,6 +165,12 @@ class Base_model:
             else:
                 self.canv.delete(self.click_indication)
                 self.state_click = 0 
+
+    def delete_all_wires(self):
+        for i in self.list_wires:
+            if (i != "not exist"):
+                i.delete_wire()
+        self.list_wires = ["not exist"] * len(self.list_nodes)
             
     def move_model(self, m_x, m_y):
         if (self.state_click  == 1):
@@ -167,10 +178,7 @@ class Base_model:
             self.x = m_x - self.delta_x
             self.y = m_y - self.delta_y
             self.canv.coords(self.click_indication, self.x, self.y, self.x + self.image_width, self.y + self.image_height) 
-            for i in self.list_wires:
-                if (i != "not exist"):
-                    i.delete_wire()
-            self.list_wires = ["not exist"] * len(self.list_nodes)
+            self.delete_all_wires()
     
     def indication_wire_connection(self, m_x, m_y):
         size_area_indication = 10
@@ -209,8 +217,8 @@ class Base_model:
             self.image_width = self.image_model_data.width()
             self.image_height = self.image_model_data.height()
             self.canv.delete(self.image_model)
-            self.delta_x = self.k_click*self.image_width
-            self.delta_y = self.k_click*self.image_height
+            self.delta_x = self.image_width/2
+            self.delta_y = self.image_height/2
             self.image_model = self.canv.create_image(m_x - self.k_click*self.image_width, m_y - self.k_click*self.image_height,image = self.image_model_data, anchor = 'nw')
             self.canv.coords(self.click_indication, m_x - self.k_click*self.image_width, m_y - self.k_click*self.image_height, m_x - self.k_click*self.image_width + self.image_width, m_y - self.k_click*self.image_height + self.image_height) 
 
@@ -221,21 +229,40 @@ class Base_model:
             self.list_wires = ["not exist"] * len(self.list_nodes)
 
     def view_results(self):
-        for i in range(math.ceil(len(self.list_results)/4)):
-            root_graph = Toplevel(self.root)
-            root_graph.title("Выбор моделей")
+        fig, axs = plt.subplots(len(self.list_graph))
+        plt.subplots_adjust(left=0.04, right=0.96, top = 0.96, bottom= 0.04, hspace=0)
+        fig.suptitle('Vertically stacked subplots')
+        counter_g = 0
+        for i in self.list_graph:
+            axs[counter_g].plot(self.t, self.list_results[i], linewidth=1, color='red')
+            axs[counter_g].grid(True)
+            counter_g += 1
 
-            if (i == (math.ceil(len(self.list_results)/4) - 1)):
-                number_of_gr = len(self.list_results) - 4 * i
-            else:
-                number_of_gr = 4
+        plt.show()
 
-            fig = Figure(figsize=(15, 10), dpi=100)
 
-            for j in range(number_of_gr):
-                fig.add_subplot(221 + j).plot(self.t, self.list_results[4*i + j])
+        #for i in range(math.ceil(len(self.list_results)/4)):
+        #    root_graph = Toplevel(self.root)
+        #    root_graph.title("Выбор моделей")
 
-            canvas = FigureCanvasTkAgg(fig, master=root_graph)  # A tk.DrawingArea.
-            canvas.draw()
-            canvas.get_tk_widget().pack(side = TOP, fill = BOTH, expand=1)
+        #    if (i == (math.ceil(len(self.list_results)/4) - 1)):
+        #        number_of_gr = len(self.list_results) - 4 * i
+        #    else:
+        #        number_of_gr = 4
 
+        #    fig = Figure(figsize=(15, 10), dpi=100)
+
+        #    for j in range(number_of_gr):
+        #        fig.add_subplot(221 + j).plot(self.t, self.list_results[4*i + j], linewidth=1, color='red')
+
+        #    canvas = FigureCanvasTkAgg(fig, master=root_graph)  # A tk.DrawingArea.
+        #    canvas.draw()
+        #    canvas.get_tk_widget().pack(side = TOP, fill = BOTH, expand=1)
+
+    def context_menu(self, m_x, m_y):
+        if ((m_x >= self.x + self.k_click*self.image_width) and (m_x <= self.x + self.image_width - self.k_click*self.image_width) and (m_y >= self.y + self.k_click*self.image_height) and (m_y <= self.y + self.image_height - self.k_click*self.image_height) and (self.bool_mouse_in_area == False)):
+            return True
+
+    def delete_model(self):
+        self.canv.delete(self.image_model)
+        self.delete_all_wires()

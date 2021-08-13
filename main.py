@@ -79,7 +79,7 @@ def get_list_nodes(event):
         print(i.list_connection)
     print("#####################################################")
 
-def start(event):
+def start():
     calculations(list_nodes, list_models)
 
 def view(event):
@@ -87,6 +87,38 @@ def view(event):
         for j in i:
             if (j != "Deleted"):
                 j.view_results()
+
+def get_menu(event):
+    delete_index = []
+    def delete_models():
+        list_models[delete_index[0]][delete_index[1]].delete_model()
+        del list_models[delete_index[0]][delete_index[1]]
+        for i in list_nodes:
+            i.control_connection(list_models)
+    for i in range(len(list_models)):
+        for j in range(len(list_models[i])):
+            if (list_models[i][j] != "Deleted"):
+                if (list_models[i][j].context_menu(event.x, event.y) == True):
+                    delete_index = [i, j]
+                    menu = Menu(tearoff=0, font = ('GOST Type A', 14))
+                    menu.add_command(label="Осциллограммы", 
+                    command= list_models[i][j].view_results)
+                    menu.add_separator()               
+                    menu.add_command(label="Удалить модель", 
+                    command= delete_models)
+                    menu.post(event.x, event.y)
+
+    def delete_nodes():
+        list_nodes[delete_index].delete_node(list_models)        
+        del list_nodes[delete_index]
+    for i in range(len(list_nodes)):
+        if (list_nodes[i].context_menu(event.x, event.y) == True):
+            delete_index = i
+            menu = Menu(tearoff=0, font = ('GOST Type A', 14))           
+            menu.add_command(label="Удалить узел", 
+            command= delete_nodes)
+            menu.post(event.x, event.y)
+
 
 # Создание главного окна
 root = Tk()
@@ -119,16 +151,21 @@ frame_menu.grid(row = 0, column = 0)
 
 #Кнопка вызова дерева моделей
 b1 = Button(master = frame_menu, text="Дерево моделей", command= b1_command, height=HEIGHT_MENU, bg = "white", font = font.Font(family = "GOST Type A"))
-b1.pack(side = LEFT, padx = 10)
+b1.pack(side = LEFT, padx = 10, pady = 10)
+
+#Кнопка для расчета
+b2 = Button(master = frame_menu, text="Начать расчет", command= start, height=HEIGHT_MENU, bg = "white", font = font.Font(family = "GOST Type A"))
+b2.pack(side = LEFT, padx = 10, pady = 10)
 
 #Бинды кнопок
 canv.bind('<Button-1>', click_1)
+canv.bind('<Button-3>', get_menu)
 canv.bind('<Motion>', mouse_motion)
 
-root.bind('s', start)
 root.bind('v', view)
 root.bind('r', rotation)
 root.bind('n', get_list_nodes)
+
 
 canv.pack()
 root.mainloop()

@@ -95,8 +95,8 @@ class Electrical_Bus:
             self.image_width = self.image_model_data.width()
             self.image_height = self.image_model_data.height()
             self.canv.delete(self.image_model)
-            self.delta_x = 5
-            self.delta_y = 5 
+            self.delta_x = self.image_width/2
+            self.delta_y = self.image_height/2 
             self.image_model = self.canv.create_image(m_x - self.delta_x, m_y - self.delta_y,image = self.image_model_data, anchor = 'nw')
 
 
@@ -148,8 +148,22 @@ class Electrical_Bus:
                 #self.list_indications.append(self.canv.create_line(self.x + self.image_width/2, 0, self.x + self.image_width/2, HEIGTH, dash = (5, 5), width = 1, fill = color))
                 self.list_indications.append(self.canv.create_line(self.x + self.image_width, 0, self.x + self.image_width, HEIGTH, dash = (5, 5), width = 1, fill = color))
 
+    def delete_node(self, list_models):
+        self.canv.delete(self.image_model)
+        for i in range(len(self.list_connection)):
+            for j in range(len(self.list_connection[i])):
+                if (self.list_connection[i][j] != "none"):
+                    for k in range(len(list_models[i][j].list_wires)):
+                        if (list_models[i][j].list_wires[k] != "not exist"):
+                            if (list_models[i][j].list_wires[k].text_tag == self.list_connection[i][j]):
+                                list_models[i][j].list_wires[k].delete_wire()
+                                list_models[i][j].list_wires[k] = "not exist"
 
     def indication_for_wire_off(self):
         for i in self.list_indications:
             self.canv.delete(i)
         self.list_indications = []
+
+    def context_menu(self, m_x, m_y):
+        if ((m_x >= self.x) and (m_x <= self.x + self.image_width) and (m_y >= self.y) and (m_y <= self.y + self.image_height)):
+            return True

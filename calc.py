@@ -116,7 +116,7 @@ def return_graphs(main_list, list_models, results, t):
 
 
 def calculations(list_nodes, list_models):
-    t_max = 5
+    t_max = 10
     t_del = 500000
     t = np.linspace(0, t_max, t_del)
 
@@ -144,14 +144,14 @@ def calculations(list_nodes, list_models):
 
             if (bool_start == False):
                 main_det = np.zeros((height_matrix, width_matrix), dtype = data_type)
-                own_matrix = np.array(list_models[type_model][number_moder].get_own_matrix(y[wait_index:(wait_index+width_input)], t), dtype = data_type)
+                own_matrix = list_models[type_model][number_moder].get_own_matrix(y[wait_index:(wait_index+width_input)], t)
                 bool_start = True
             else:   
                 main_det = np.hstack((main_det, np.zeros((main_det.shape[0], width_matrix), dtype = data_type)))  
                 main_det = np.vstack((main_det, np.zeros((height_matrix, main_det.shape[1]), dtype = data_type)))
-                own_matrix = np.hstack((own_matrix, np.array(list_models[type_model][number_moder].get_own_matrix(y[wait_index:(wait_index+width_input)], t), dtype = data_type)))
+                own_matrix = np.hstack((own_matrix, list_models[type_model][number_moder].get_own_matrix(y[wait_index:(wait_index+width_input)], t)))
 
-            buffer_det = np.array(list_models[type_model][number_moder].get_main_determinant(y[wait_index:(wait_index+width_input)], t), dtype = data_type)
+            buffer_det = list_models[type_model][number_moder].get_main_determinant(y[wait_index:(wait_index+width_input)], t)
 
             for i in range(height_matrix):
                 for j in range(width_matrix):
@@ -177,7 +177,7 @@ def calculations(list_nodes, list_models):
                 ouput_matrix.append(list_models[type_model][number_moder].get_additional_variable(y[wait_index:(wait_index+list_models[type_model][number_moder].width_input)], t)[m])
             wait_index += list_models[type_model][number_moder].width_input
 
-        #print(str(round(t/t_max*100, 3)), end = "\r")
+        print(str(round(t/t_max*100, 3)), end = "\r")
     
         return ouput_matrix
 
