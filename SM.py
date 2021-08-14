@@ -17,6 +17,15 @@ def moment_pd(t, t0, t2, M_max):
     if (t > t1):
         return M_max
 
+def get_wc(Xc, delta, S):
+    mu0 = 4 * math.pi * (10 ** (-7))
+    return math.sqrt(Xc*math.pi*delta*math.pi/(100*math.pi*2*mu0*2*S*1.5))
+
+def get_wr(wc, delta, S, Pn, cosfi, Un, Ifn, Xc):
+    mu0 = 4 * math.pi * (10 ** (-7))
+    return ((math.sqrt((Pn/math.sqrt(3)/cosfi/Un*1000*math.sqrt(2)*Xc)**2 + (Un*1000/math.sqrt(3)*math.sqrt(2))**2 + 2*Pn/math.sqrt(3)/cosfi/Un*1000*math.sqrt(2)*Xc*Un*1000/math.sqrt(3)*math.sqrt(2)*math.sin(math.fabs(math.acos(cosfi)))))*(math.pi*delta*math.pi)/(100*math.pi*wc*Ifn*mu0*4*S))
+
+
 coord = [
     [[587, 177]],
     [[179, 702]],
@@ -135,3 +144,15 @@ class SM(Base_model):
                             ], dtype = self.data_type)  
         return additional_variable
 
+    def set_primary_parameters(self):
+        if (self.secondary_parameters != ["Нет данных"] * len(self.list_text_secondary_parameters)):
+            self.wc = np.float64(get_wc(Xc = self.secondary_parameters[4], delta = self.secondary_parameters[11], S = self.secondary_parameters[9]*self.secondary_parameters[10]))
+            self.wr = np.float64(get_wr(wc = self.wc, delta = self.secondary_parameters[11], S = self.secondary_parameters[9]*self.secondary_parameters[10], Pn = self.secondary_parameters[1], cosfi= self.secondary_parameters[2], Un= self.secondary_parameters[0], Ifn = self.secondary_parameters[3]/self.secondary_parameters[6], Xc = self.secondary_parameters[4]))
+            self.Rs = np.float64(self.secondary_parameters[5])
+            self.Rr = np.float64(self.secondary_parameters[6])
+            self.Ls = np.float64(self.secondary_parameters[7])
+            self.Lrs = np.float64(self.secondary_parameters[8])
+            self.delta = self.secondary_parameters[11]
+            self.tau = self.secondary_parameters[9]
+            self.l = self.secondary_parameters[10]
+            self.J = self.secondary_parameters[12]

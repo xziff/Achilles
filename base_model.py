@@ -129,9 +129,10 @@ class Base_model:
         self.list_text_example_models = list_text_example_models
         self.list_text_secondary_parameters = list_text_secondary_parameters
         if (initial_secondary_parameters == None):
-            self.secondary_parameters = [0] * len(self.list_text_secondary_parameters)
+            self.secondary_parameters = ["Нет данных"] * len(self.list_text_secondary_parameters)
         else:
-            pass
+            self.secondary_parameters = initial_secondary_parameters
+            self.set_primary_parameters()
         self.list_graph = list_graph
         self.list_nodes = list_nodes
         self.canv = canv
@@ -276,10 +277,14 @@ class Base_model:
         def on_closing():
             if (list_example.current() == 0):
                 for i in range(len(self.list_text_secondary_parameters)):
-                    self.secondary_parameters[i] = float(list_string_variable[i].get())
+                    try:
+                        self.secondary_parameters[i] = float(list_string_variable[i].get())
+                    except ValueError:
+                        self.secondary_parameters[i] = list_string_variable[i].get()
             else:
                 for i in range(len(self.list_text_secondary_parameters)):
                     self.secondary_parameters[i] = self.list_example_parameters[list_example.current()-1][i]
+            self.set_primary_parameters()
             secondary_parameters_window.destroy()
 
         secondary_parameters_window = Toplevel(self.root, bg = "white")
@@ -296,19 +301,47 @@ class Base_model:
         list_example.current(0)
         list_string_variable = []
 
+        ttk.Separator(secondary_parameters_window, orient=VERTICAL).grid(column=1, row=0, rowspan=len(self.list_text_secondary_parameters)*2 + 2, sticky='ns') 
+
         for i in range(len(self.list_text_secondary_parameters)):
-            for j in [0, 1]:
+            ttk.Separator(secondary_parameters_window, orient=HORIZONTAL).grid(column=0, row=2*i, columnspan=3, sticky='ew')
+            for j in [0, 2]:
                 if (j == 0):
                     label = Label(master= secondary_parameters_window, text=self.list_text_secondary_parameters[i], font=('GOST Type A', 16), bg= "white")
-                    label.grid(row=i, column=j)
+                    label.grid(row=i*2 + 1, column=j)
                 else:
-                    list_string_variable.append(StringVar(value=str(round(self.secondary_parameters[i], 5))))
-                    entry = Entry(secondary_parameters_window, textvariable = list_string_variable[-1], width=16,
-                        font=('GOST Type A', 14), relief = SOLID, borderwidth = 1, justify = CENTER)
-                    entry.grid(row=i, column=j)
+                    try:
+                        list_string_variable.append(StringVar(value=str(round(self.secondary_parameters[i], 5))))
+                    except TypeError:
+                        list_string_variable.append(StringVar(value=self.secondary_parameters[i]))
+                    entry = Entry(secondary_parameters_window, textvariable = list_string_variable[-1], width=10,
+                        font=('GOST Type A', 14), relief = FLAT, justify = CENTER)
+                    entry.grid(row=i*2 + 1, column=j)
+        ttk.Separator(secondary_parameters_window, orient=HORIZONTAL).grid(column=0, row=len(self.list_text_secondary_parameters)*2, columnspan=3, sticky='ew')
         label = Label(master= secondary_parameters_window, text="Выбрать из справочника", font=('GOST Type A', 16), bg= "white")
-        label.grid(row=len(self.list_text_secondary_parameters), column=0)
-        list_example.grid(row=len(self.list_text_secondary_parameters), column=1)
+        label.grid(row=len(self.list_text_secondary_parameters)*2 + 1, column=0)
+        list_example.grid(row=len(self.list_text_secondary_parameters)*2 + 1, column=2)
+
+    def set_control_actions(self):
+        control_actions_window = Toplevel(self.root, bg = "white")
+        control_actions_window.title("Выбор управляющих воздействий")
+
+        label = Label(master= control_actions_window, text="Время, с", font=('GOST Type A', 16), bg= "white")
+        label.grid(row=0, column=0)
+        label = Label(master= control_actions_window, text="Параметр", font=('GOST Type A', 16), bg= "white")
+        label.grid(row=2, column=0)
+
+        for j in range(5):
+            ttk.Separator(control_actions_window, orient=VERTICAL).grid(column=1 + 2*j, row=0, rowspan=3, sticky='ns')
+
+        for i in [0, 2]:
+            for j in range(5):
+                entry = Entry(control_actions_window, width=5,
+                            font=('GOST Type A', 14), relief = FLAT, justify = CENTER)
+                entry.grid(row=i, column=2*j + 1 + 1, padx = 15)
+
+        ttk.Separator(control_actions_window, orient=HORIZONTAL).grid(column=0, row=1, columnspan=11, sticky='ew')       
+        
 
     def delete_model(self):
         self.canv.delete(self.image_model)

@@ -107,7 +107,7 @@ def get_menu(event):
                     menu.add_command(label="Параметры модели", 
                     command= list_models[i][j].set_secondary_parameters)
                     menu.add_command(label="Управляющие воздействия", 
-                    command= list_models[i][j].view_results)
+                    command= list_models[i][j].set_control_actions)
                     menu.add_separator()             
                     menu.add_command(label="Удалить модель", 
                     command= delete_models)
