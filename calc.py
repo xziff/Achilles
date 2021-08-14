@@ -126,10 +126,6 @@ def calculations(list_nodes, list_models):
 
     all_voltage_matrix, all_current_matrix = communacation_matrix(list_nodes, list_models, main_list)
 
-    print(all_voltage_matrix)
-
-    print(all_current_matrix)
-
     def f(y, t):
         wait_index = 0
         current_index = [0, 0]

@@ -337,7 +337,6 @@ class Base_model:
                     if (list_p[i][j].get() != ''):
                         list_params[-1][-1].append(float(list_p[i][j].get()))
 
-            print(list_params)
             control_actions_window.destroy()
 
         control_actions_window = Toplevel(self.root, bg = "white")
