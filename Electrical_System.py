@@ -19,11 +19,25 @@ list_nodes = ["Q:ON_SWITCH"]
 
 list_graph = [0, 1]
 
+list_text_secondary_parameters = ["Действующее значение напряженя, кВ:",
+    "Частота, Гц:",
+    "Начальная фаза напряжения, градус:",
+    "Индуктивное сопротивление сети, Ом:",
+ ]
+
+list_text_example_models = [
+    "Пользовательский",
+    "Сеть 10 кВ"
+]
+
+list_example_parameters = [[10.5, 50, 0, 0.02],
+    ]
+
 class Electrical_System(Base_model):
 
     def __init__(self, init_x, init_y, canv, root):
 
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/Electrical System/", coord, 0, list_nodes, list_graph)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/Electrical System/", coord, 0, list_nodes, list_graph, list_text_secondary_parameters, None, list_text_example_models, list_example_parameters)
 
         ###
         self.Uc = np.float64(6060)
@@ -71,3 +85,10 @@ class Electrical_System(Base_model):
     def get_additional_variable(self, input_variable, t):
         additional_variable = np.array([], dtype = self.data_type) 
         return additional_variable
+
+    def set_primary_parameters(self):
+        if (self.secondary_parameters != ["Нет данных"] * len(self.list_text_secondary_parameters)):
+            self.Uc = np.float64(self.secondary_parameters[0] * 1000/ np.sqrt(3))
+            self.fc = np.float64(self.secondary_parameters[1])
+            self.phic = np.float64(self.secondary_parameters[2] * np.pi / 180)
+            self.Lc = np.float64(self.secondary_parameters[3]/(2*np.pi*self.fc))

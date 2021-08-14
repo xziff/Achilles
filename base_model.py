@@ -322,27 +322,66 @@ class Base_model:
         label.grid(row=len(self.list_text_secondary_parameters)*2 + 1, column=0)
         list_example.grid(row=len(self.list_text_secondary_parameters)*2 + 1, column=2)
 
-    def set_control_actions(self):
+    def help_set_control_actions(self, list_text_control_actions, list_params):
+        num_col = 8
+
+        def on_closing():
+            for i in range(len(list_text_control_actions)):
+                list_params.append([])
+                list_params[-1].append([])
+                for j in range(len(list_t[i])):
+                    if (list_t[i][j].get() != ''):
+                        list_params[-1][-1].append(float(list_t[i][j].get()))
+                list_params[-1].append([])
+                for j in range(len(list_p[i])):
+                    if (list_p[i][j].get() != ''):
+                        list_params[-1][-1].append(float(list_p[i][j].get()))
+
+            print(list_params)
+            control_actions_window.destroy()
+
         control_actions_window = Toplevel(self.root, bg = "white")
         control_actions_window.title("Выбор управляющих воздействий")
+        control_actions_window.protocol("WM_DELETE_WINDOW", on_closing)
 
-        label = Label(master= control_actions_window, text="Время, с", font=('GOST Type A', 16), bg= "white")
-        label.grid(row=0, column=0)
-        label = Label(master= control_actions_window, text="Параметр", font=('GOST Type A', 16), bg= "white")
-        label.grid(row=2, column=0)
+        list_t = []
+        list_p = []
 
-        for j in range(5):
-            ttk.Separator(control_actions_window, orient=VERTICAL).grid(column=1 + 2*j, row=0, rowspan=3, sticky='ns')
+        for i in range(len(list_text_control_actions)):
+            list_t.append([])
+            list_p.append([])
+            frame=Frame(master = control_actions_window, bg= "white")
+            frame.grid(row = i, column = 0, pady = (8, 0), sticky='ew')
+            label = Label(master= frame, text=list_text_control_actions[i], font=('GOST Type A', 16), bg= "white")
+            label.grid(row=0, column=0, columnspan=num_col*2 + 1)
+            label = Label(master= frame, text="Время, с", font=('GOST Type A', 16), bg= "white")
+            label.grid(row=2, column=0)
+            label = Label(master= frame, text="Параметр", font=('GOST Type A', 16), bg= "white")
+            label.grid(row=4, column=0)
 
-        for i in [0, 2]:
-            for j in range(5):
-                entry = Entry(control_actions_window, width=5,
-                            font=('GOST Type A', 14), relief = FLAT, justify = CENTER)
-                entry.grid(row=i, column=2*j + 1 + 1, padx = 15)
+            for j in range(num_col):
+                ttk.Separator(frame, orient=VERTICAL).grid(column=1 + 2*j, row=1, rowspan=4, sticky='ns')
 
-        ttk.Separator(control_actions_window, orient=HORIZONTAL).grid(column=0, row=1, columnspan=11, sticky='ew')       
+            for i in [2, 4]:    
+                for j in range(num_col):
+                    if (i == 2):
+                        list_t[-1].append(StringVar())
+                        entry = Entry(frame, width=5,
+                            font=('GOST Type A', 14), relief = FLAT, justify = CENTER, textvariable = list_t[-1][-1])
+                    elif (i == 4):
+                        list_p[-1].append(StringVar())
+                        entry = Entry(frame, width=5,
+                            font=('GOST Type A', 14), relief = FLAT, justify = CENTER, textvariable = list_p[-1][-1])
+                    entry.grid(row=i, column=2*j + 1 + 1, padx = 15)
+
+            ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=1, columnspan=num_col*2 + 1, sticky='ew')  
+            ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=3, columnspan=num_col*2 + 1, sticky='ew')
+            ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=5, columnspan=num_col*2 + 1, sticky='ew')         
         
 
     def delete_model(self):
         self.canv.delete(self.image_model)
         self.delete_all_wires()
+
+    def set_control_actions(self):
+        pass

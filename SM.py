@@ -8,6 +8,11 @@ import numpy as np
 
 from base_model import Base_model
 
+def line_func(list_points, t):
+    for i in range(len(list_points[0]) - 1):
+        if ((t >= list_points[0][i]) and (t <= list_points[0][i+1])):
+            return list_points[1][i] + (list_points[1][i+1]-list_points[1][i])/(list_points[0][i+1]-list_points[0][i])*(t - list_points[0][i])
+
 def moment_pd(t, t0, t2, M_max):
     t1 = t0 + t2
     if ((t >= t0) and (t <= t1)):
@@ -117,7 +122,7 @@ class SM(Base_model):
     def get_own_matrix(self, input_variable, t):
         own_matrix = np.array([input_variable[0]*self.Rs - input_variable[1]*self.Rs + input_variable[3]*(2*self.wc*self.wr*input_variable[2]*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(np.cos(np.pi/2 + input_variable[4]) + (-1)*np.cos(np.pi/6 - input_variable[4])),
                     input_variable[1]*self.Rs - (-input_variable[0]-input_variable[1])*self.Rs + input_variable[3]*(2*self.wc*self.wr*input_variable[2]*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(-(-1)*np.cos(np.pi/6 - input_variable[4]) + np.cos(-np.pi/6 - input_variable[4])),
-                   input_variable[2]*self.Rr - self.Urxx - moment_pd(t, self.t0, self.t2, self.Ur - self.Urxx) - input_variable[3]*(2*self.wc*self.wr*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(input_variable[0]*np.cos(np.pi/2 - input_variable[4]) + input_variable[1]*np.cos(np.pi/2 - input_variable[4] + 2*np.pi/3) + (-input_variable[0]-input_variable[1])*np.cos(np.pi/2 - input_variable[4] - 2*np.pi/3))], dtype = self.data_type)          
+                   input_variable[2]*self.Rr - line_func(self.list_params[1], t) - input_variable[3]*(2*self.wc*self.wr*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(input_variable[0]*np.cos(np.pi/2 - input_variable[4]) + input_variable[1]*np.cos(np.pi/2 - input_variable[4] + 2*np.pi/3) + (-input_variable[0]-input_variable[1])*np.cos(np.pi/2 - input_variable[4] - 2*np.pi/3))], dtype = self.data_type)          
         return own_matrix
 
     def get_voltage_matrix(self, parameter):
@@ -139,7 +144,7 @@ class SM(Base_model):
     def get_additional_variable(self, input_variable, t):
         Melmag = 2*self.tau/np.pi*self.wr*(2*self.wc*input_variable[2]*self.l*self.mu0)/(np.pi*self.delta)*(input_variable[0]*np.cos(np.pi/2 - input_variable[4]) + input_variable[1]*np.cos(np.pi/2 - input_variable[4] + 2*np.pi/3) + (-input_variable[0]-input_variable[1])*np.cos(np.pi/2 - input_variable[4] - 2*np.pi/3))
         additional_variable = np.array([
-                            (moment_pd(t, self.t0, self.t2, self.M_max) - Melmag)/self.J,
+                            (1000 * line_func(self.list_params[0], t) - Melmag)/self.J,
                             input_variable[3]
                             ], dtype = self.data_type)  
         return additional_variable
@@ -156,3 +161,10 @@ class SM(Base_model):
             self.tau = self.secondary_parameters[9]
             self.l = self.secondary_parameters[10]
             self.J = self.secondary_parameters[12]
+
+    def set_control_actions(self):
+        self.list_params = []
+        list_text_control_actions = ["Механический момент, кН*м", "Напряжение возбуждения, В"]
+        self.help_set_control_actions(list_text_control_actions, self.list_params)
+
+

@@ -116,7 +116,7 @@ def return_graphs(main_list, list_models, results, t):
 
 
 def calculations(list_nodes, list_models):
-    t_max = 10
+    t_max = 4
     t_del = 500000
     t = np.linspace(0, t_max, t_del)
 
