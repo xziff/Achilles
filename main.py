@@ -103,7 +103,12 @@ def get_menu(event):
                     menu = Menu(tearoff=0, font = ('GOST Type A', 14))
                     menu.add_command(label="Осциллограммы", 
                     command= list_models[i][j].view_results)
-                    menu.add_separator()               
+                    menu.add_separator()    
+                    menu.add_command(label="Параметры модели", 
+                    command= list_models[i][j].set_secondary_parameters)
+                    menu.add_command(label="Управляющие воздействия", 
+                    command= list_models[i][j].view_results)
+                    menu.add_separator()             
                     menu.add_command(label="Удалить модель", 
                     command= delete_models)
                     menu.post(event.x, event.y)

@@ -122,7 +122,16 @@ class Wire:
 
 class Base_model:
 
-    def __init__(self, init_x, init_y, canv, root, path_to_image_model, dxdy, position, list_nodes, list_graph):
+    def __init__(self, init_x, init_y, canv, root, path_to_image_model, dxdy, position, list_nodes, 
+    list_graph, list_text_secondary_parameters, initial_secondary_parameters, list_text_example_models, list_example_parameters):
+
+        self.list_example_parameters = list_example_parameters
+        self.list_text_example_models = list_text_example_models
+        self.list_text_secondary_parameters = list_text_secondary_parameters
+        if (initial_secondary_parameters == None):
+            self.secondary_parameters = [0] * len(self.list_text_secondary_parameters)
+        else:
+            pass
         self.list_graph = list_graph
         self.list_nodes = list_nodes
         self.canv = canv
@@ -262,6 +271,44 @@ class Base_model:
     def context_menu(self, m_x, m_y):
         if ((m_x >= self.x + self.k_click*self.image_width) and (m_x <= self.x + self.image_width - self.k_click*self.image_width) and (m_y >= self.y + self.k_click*self.image_height) and (m_y <= self.y + self.image_height - self.k_click*self.image_height) and (self.bool_mouse_in_area == False)):
             return True
+
+    def set_secondary_parameters(self):
+        def on_closing():
+            if (list_example.current() == 0):
+                for i in range(len(self.list_text_secondary_parameters)):
+                    self.secondary_parameters[i] = float(list_string_variable[i].get())
+            else:
+                for i in range(len(self.list_text_secondary_parameters)):
+                    self.secondary_parameters[i] = self.list_example_parameters[list_example.current()-1][i]
+            secondary_parameters_window.destroy()
+
+        secondary_parameters_window = Toplevel(self.root, bg = "white")
+        secondary_parameters_window.title("Выбор параметров модели")
+        secondary_parameters_window.protocol("WM_DELETE_WINDOW", on_closing)
+
+        def ComboboxSelected(event):
+            if (list_example.current() != 0):
+                for i in range(len(list_string_variable)):
+                    list_string_variable[i].set(str(round(self.list_example_parameters[list_example.current()-1][i], 5)))
+            
+        list_example = ttk.Combobox(secondary_parameters_window, values = self.list_text_example_models,state="readonly", font=('GOST Type A', 16), width= 16)
+        list_example.bind("<<ComboboxSelected>>", ComboboxSelected)
+        list_example.current(0)
+        list_string_variable = []
+
+        for i in range(len(self.list_text_secondary_parameters)):
+            for j in [0, 1]:
+                if (j == 0):
+                    label = Label(master= secondary_parameters_window, text=self.list_text_secondary_parameters[i], font=('GOST Type A', 16), bg= "white")
+                    label.grid(row=i, column=j)
+                else:
+                    list_string_variable.append(StringVar(value=str(round(self.secondary_parameters[i], 5))))
+                    entry = Entry(secondary_parameters_window, textvariable = list_string_variable[-1], width=16,
+                        font=('GOST Type A', 14), relief = SOLID, borderwidth = 1, justify = CENTER)
+                    entry.grid(row=i, column=j)
+        label = Label(master= secondary_parameters_window, text="Выбрать из справочника", font=('GOST Type A', 16), bg= "white")
+        label.grid(row=len(self.list_text_secondary_parameters), column=0)
+        list_example.grid(row=len(self.list_text_secondary_parameters), column=1)
 
     def delete_model(self):
         self.canv.delete(self.image_model)

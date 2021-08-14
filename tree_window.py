@@ -37,7 +37,7 @@ def add_model(mass_model, list_nodes, return_text, WIDTH, HEIGHT, canv, root):
 
 def get_tree_window(root):
 
-    tree_window = Toplevel(root)
+    tree_window = Toplevel(root, bg = "white")
     tree_window.title("Выбор моделей")
 
     style = ttk.Style()
