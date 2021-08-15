@@ -46,11 +46,11 @@ def communacation_matrix(list_nodes, list_models, main_list):
                             help_voltage_matrix[o + wait_index].append(list_models[main_list[j][0]][main_list[j][1]].get_voltage_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0])[o][p])
                     wait_index += len(list_models[main_list[j][0]][main_list[j][1]].get_voltage_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0]))
                 else:
-                    for o in range(len(list_models[main_list[j][0]][main_list[j][1]].height_matrix)):
+                    for o in range(list_models[main_list[j][0]][main_list[j][1]].height_matrix):
                         help_voltage_matrix.append([])
                         for p in range(3):
                             help_voltage_matrix[o + wait_index].append(0)
-                    wait_index += len(list_models[main_list[j][0]][main_list[j][1]].height_matrix)
+                    wait_index += list_models[main_list[j][0]][main_list[j][1]].height_matrix
                 
                 if ((list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]] != "none") and (list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[1] == "ON_SWITCH")):
                     for o in range(len(list_models[main_list[j][0]][main_list[j][1]].get_current_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0]))):
@@ -58,7 +58,7 @@ def communacation_matrix(list_nodes, list_models, main_list):
                             help_current_matrix[o].append(list_models[main_list[j][0]][main_list[j][1]].get_current_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0])[o][p])
                 else:
                     for o in range(3):
-                        for p in range(len(list_models[main_list[j][0]][main_list[j][1]].width_matrix)):
+                        for p in range(list_models[main_list[j][0]][main_list[j][1]].width_matrix):
                             help_current_matrix[o].append(0)
 
 

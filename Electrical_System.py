@@ -33,11 +33,17 @@ list_text_example_models = [
 list_example_parameters = [[10.5, 50, 0, 0.02],
     ]
 
+list_text_control_actions = []
+
+list_text_initial_conditions = ["Ток фазы 'А', А",
+    "Ток фазы 'B', А",
+    "Ток фазы 'C', А",]
+
 class Electrical_System(Base_model):
 
     def __init__(self, init_x, init_y, canv, root):
 
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/Electrical System/", coord, 0, list_nodes, list_graph, list_text_secondary_parameters, None, list_text_example_models, list_example_parameters)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/Electrical System/", coord, 0, list_nodes, list_graph, list_text_secondary_parameters, None, list_text_example_models, list_example_parameters, list_text_control_actions, list_text_initial_conditions, None, None)
 
         ###
         self.Uc = np.float64(6060)
@@ -45,9 +51,9 @@ class Electrical_System(Base_model):
         self.phic = np.float64(0)
         self.Lc = np.float64(0.02/(314.15))
 
-        self.width_input = len(self.get_first())
-        self.width_matrix = len(self.get_main_determinant(self.get_first(), 0)[0])
-        self.height_matrix = len(self.get_main_determinant(self.get_first(), 0))
+        self.width_input = 3
+        self.width_matrix = 3
+        self.height_matrix = 3
 
     def get_first(self):
         return ([0, 0, 0])
@@ -81,10 +87,6 @@ class Electrical_System(Base_model):
                         [0, 0, -1],
                         ] 
             return current_matrix
-
-    def get_additional_variable(self, input_variable, t):
-        additional_variable = np.array([], dtype = self.data_type) 
-        return additional_variable
 
     def set_primary_parameters(self):
         if (self.secondary_parameters != ["Нет данных"] * len(self.list_text_secondary_parameters)):

@@ -123,11 +123,25 @@ class Wire:
 class Base_model:
 
     def __init__(self, init_x, init_y, canv, root, path_to_image_model, dxdy, position, list_nodes, 
-    list_graph, list_text_secondary_parameters, initial_secondary_parameters, list_text_example_models, list_example_parameters):
+    list_graph, list_text_secondary_parameters, initial_secondary_parameters, list_text_example_models, list_example_parameters,
+    list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions):
 
+        self.mu0 = np.float64(4*np.pi*10**(-7))
+        self.list_text_control_actions = list_text_control_actions
+        self.list_text_initial_conditions = list_text_initial_conditions
         self.list_example_parameters = list_example_parameters
         self.list_text_example_models = list_text_example_models
         self.list_text_secondary_parameters = list_text_secondary_parameters
+        if (initial_initial_conditions == None):
+            self.list_initial_conditions = [0] * len(self.list_text_initial_conditions)
+        else:
+            self.list_initial_conditions = initial_initial_conditions
+        if (initial_control_actions == None):
+            self.list_params = []
+            for i in range(len(list_text_control_actions)):                
+                self.list_params.append([[], []])
+        else:
+            self.list_params = initial_control_actions
         if (initial_secondary_parameters == None):
             self.secondary_parameters = ["Нет данных"] * len(self.list_text_secondary_parameters)
         else:
@@ -162,8 +176,12 @@ class Base_model:
         self.quad_indication_create = False #
         self.data_type = np.float64
 
-    #def __del__(self):
-    #    print("111111")
+    def get_first(self):
+        return self.list_initial_conditions
+
+    def get_additional_variable(self, input_variable, t):
+        additional_variable = np.array([], dtype = self.data_type) 
+        return additional_variable
 
     def set_state_click(self, m_x, m_y):
         if ((m_x >= self.x + self.k_click*self.image_width) and (m_x <= self.x + self.image_width - self.k_click*self.image_width) and (m_y >= self.y + self.k_click*self.image_height) and (m_y <= self.y + self.image_height - self.k_click*self.image_height) and (self.bool_mouse_in_area == False)):
@@ -322,20 +340,26 @@ class Base_model:
         label.grid(row=len(self.list_text_secondary_parameters)*2 + 1, column=0)
         list_example.grid(row=len(self.list_text_secondary_parameters)*2 + 1, column=2)
 
-    def help_set_control_actions(self, list_text_control_actions, list_params):
+    def set_control_actions(self):
         num_col = 8
-
         def on_closing():
-            for i in range(len(list_text_control_actions)):
-                list_params.append([])
-                list_params[-1].append([])
-                for j in range(len(list_t[i])):
-                    if (list_t[i][j].get() != ''):
-                        list_params[-1][-1].append(float(list_t[i][j].get()))
-                list_params[-1].append([])
-                for j in range(len(list_p[i])):
-                    if (list_p[i][j].get() != ''):
-                        list_params[-1][-1].append(float(list_p[i][j].get()))
+            if (len(self.list_text_control_actions) != 0):
+                self.list_params = []
+                for i in range(len(self.list_text_control_actions)):
+                    self.list_params.append([])
+                    self.list_params[-1].append([])
+                    for j in range(len(list_t[i])):
+                        if (list_t[i][j].get() != ''):
+                            self.list_params[-1][-1].append(float(list_t[i][j].get()))
+                    self.list_params[-1].append([])
+                    for j in range(len(list_p[i])):
+                        if (list_p[i][j].get() != ''):
+                            self.list_params[-1][-1].append(float(list_p[i][j].get()))
+
+
+            self.list_initial_conditions = []
+            for i in range(len(self.list_text_initial_conditions)):
+                self.list_initial_conditions.append(float(list_SV_initial_conditions[i].get()))
 
             control_actions_window.destroy()
 
@@ -343,44 +367,72 @@ class Base_model:
         control_actions_window.title("Выбор управляющих воздействий")
         control_actions_window.protocol("WM_DELETE_WINDOW", on_closing)
 
-        list_t = []
-        list_p = []
+        if (len(self.list_text_control_actions) != 0):
+            list_t = []
+            list_p = []
 
-        for i in range(len(list_text_control_actions)):
-            list_t.append([])
-            list_p.append([])
-            frame=Frame(master = control_actions_window, bg= "white")
-            frame.grid(row = i, column = 0, pady = (8, 0), sticky='ew')
-            label = Label(master= frame, text=list_text_control_actions[i], font=('GOST Type A', 16), bg= "white")
-            label.grid(row=0, column=0, columnspan=num_col*2 + 1)
-            label = Label(master= frame, text="Время, с", font=('GOST Type A', 16), bg= "white")
-            label.grid(row=2, column=0)
-            label = Label(master= frame, text="Параметр", font=('GOST Type A', 16), bg= "white")
-            label.grid(row=4, column=0)
+            for i in range(len(self.list_text_control_actions)):
+                list_t.append([])
+                list_p.append([])
+                frame=Frame(master = control_actions_window, bg= "white")
+                frame.pack(side = TOP, pady = (10, 0))
+                label = Label(master= frame, text=self.list_text_control_actions[i], font=('GOST Type A', 16), bg= "white")
+                label.grid(row=0, column=0, columnspan=num_col*2 + 1)
+                label = Label(master= frame, text="Время, с", font=('GOST Type A', 16), bg= "white")
+                label.grid(row=2, column=0)
+                label = Label(master= frame, text="Параметр", font=('GOST Type A', 16), bg= "white")
+                label.grid(row=4, column=0)
 
-            for j in range(num_col):
-                ttk.Separator(frame, orient=VERTICAL).grid(column=1 + 2*j, row=1, rowspan=4, sticky='ns')
-
-            for i in [2, 4]:    
                 for j in range(num_col):
-                    if (i == 2):
-                        list_t[-1].append(StringVar())
-                        entry = Entry(frame, width=5,
-                            font=('GOST Type A', 14), relief = FLAT, justify = CENTER, textvariable = list_t[-1][-1])
-                    elif (i == 4):
-                        list_p[-1].append(StringVar())
-                        entry = Entry(frame, width=5,
-                            font=('GOST Type A', 14), relief = FLAT, justify = CENTER, textvariable = list_p[-1][-1])
-                    entry.grid(row=i, column=2*j + 1 + 1, padx = 15)
+                    ttk.Separator(frame, orient=VERTICAL).grid(column=1 + 2*j, row=1, rowspan=4, sticky='ns')
 
-            ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=1, columnspan=num_col*2 + 1, sticky='ew')  
-            ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=3, columnspan=num_col*2 + 1, sticky='ew')
-            ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=5, columnspan=num_col*2 + 1, sticky='ew')         
-        
+                for k in [2, 4]:    
+                    for j in range(num_col):
+                        if (k == 2):
+                            if (j < len(self.list_params[i][0])):
+                                text_tag = str(self.list_params[i][0][j])
+                            else:
+                                text_tag = ""
+                            list_t[-1].append(StringVar(value = text_tag))
+                            entry = Entry(frame, width=5,
+                                font=('GOST Type A', 14), relief = FLAT, justify = CENTER, textvariable = list_t[-1][-1])
+                        elif (k == 4):
+                            if (j < len(self.list_params[i][1])):
+                                text_tag = str(self.list_params[i][1][j])
+                            else:
+                                text_tag = ""
+                            list_p[-1].append(StringVar(value = text_tag))
+                            entry = Entry(frame, width=5,
+                                font=('GOST Type A', 14), relief = FLAT, justify = CENTER, textvariable = list_p[-1][-1])
+                        entry.grid(row=k, column=2*j + 1 + 1, padx = 15)
+
+                ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=1, columnspan=num_col*2 + 1, sticky='ew')  
+                ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=3, columnspan=num_col*2 + 1, sticky='ew')
+                ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=5, columnspan=num_col*2 + 1, sticky='ew')         
+
+        frame=Frame(master = control_actions_window, bg= "white")
+        frame.pack(side = TOP, pady = (10, 0))
+
+        label = Label(master= frame, text="Начальные условия для расчета", font=('GOST Type A', 16), bg= "white")
+        label.grid(row=0, column=0, columnspan=len(self.list_text_initial_conditions)*2 + 0)
+        ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=1, columnspan=len(self.list_text_initial_conditions)*2 + 0, sticky='ew')  
+        ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=3, columnspan=len(self.list_text_initial_conditions)*2 + 0, sticky='ew')
+        ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=5, columnspan=len(self.list_text_initial_conditions)*2 + 0, sticky='ew')
+
+        list_SV_initial_conditions = []
+        for i in range(len(self.list_text_initial_conditions)):
+            label = Label(master= frame, text=self.list_text_initial_conditions[i], font=('GOST Type A', 16), bg= "white")
+            label.grid(row=2, column=i*2)
+            ttk.Separator(frame, orient=VERTICAL).grid(column=i*2 + 1, row=1, rowspan=4, sticky='ns')
+            if (len(self.list_initial_conditions) == 0):
+                text_tag = ""
+            else:
+                text_tag = str(self.list_initial_conditions[i])
+            list_SV_initial_conditions.append(StringVar(value= text_tag))
+            entry = Entry(frame, width=5,
+                font=('GOST Type A', 14), relief = FLAT, justify = CENTER, textvariable = list_SV_initial_conditions[-1])
+            entry.grid(row=4, column=i*2) 
 
     def delete_model(self):
         self.canv.delete(self.image_model)
         self.delete_all_wires()
-
-    def set_control_actions(self):
-        pass

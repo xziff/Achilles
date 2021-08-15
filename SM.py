@@ -13,15 +13,6 @@ def line_func(list_points, t):
         if ((t >= list_points[0][i]) and (t <= list_points[0][i+1])):
             return list_points[1][i] + (list_points[1][i+1]-list_points[1][i])/(list_points[0][i+1]-list_points[0][i])*(t - list_points[0][i])
 
-def moment_pd(t, t0, t2, M_max):
-    t1 = t0 + t2
-    if ((t >= t0) and (t <= t1)):
-        return ((M_max)/(t1-t0)*t - (M_max)/(t1-t0)*t0)
-    if (t < t0):
-        return 0
-    if (t > t1):
-        return M_max
-
 def get_wc(Xc, delta, S):
     mu0 = 4 * math.pi * (10 ** (-7))
     return math.sqrt(Xc*math.pi*delta*math.pi/(100*math.pi*2*mu0*2*S*1.5))
@@ -79,38 +70,22 @@ list_example_parameters = [[10.5, 63, 0.8, 139.61, 2.118, 0.002, 0.0953, 0.0001,
     [18, 400, 0.95, 439.9616, 1.62, 0.00084, 0.2644, 0.0001, 0.0002, 5.3, 1.29*math.pi/2, 0.0824, 8670]
     ]
 
+list_text_control_actions = ["Механический момент, кН*м", "Напряжение возбуждения, В"]
+
+list_text_initial_conditions = ["Ток фазы 'А', А", 
+                                    "Ток фазы 'B', А",
+                                    "Ток возбуждения, А",
+                                    "Частота вращения ротора, рад/с",
+                                    "Угол поворота ротора, рад", ]
+
 class SM(Base_model):
 
     def __init__(self, init_x, init_y, canv, root):
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/SM/", coord, 0, list_nodes, list_graph, list_text_secondary_parameters, None, list_text_example_models, list_example_parameters)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/SM/", coord, 0, list_nodes, list_graph, list_text_secondary_parameters, None, list_text_example_models, list_example_parameters, list_text_control_actions, list_text_initial_conditions, None, None)
 
-        ###
-        self.mu0 = np.float64(4 * np.pi * (10 ** (-7)))
-        self.wc = np.float64(8.46)
-        self.wr = np.float64(79.26)
-        self.Rs = np.float64(0.002)
-        self.Rr = np.float64(0.095)
-        self.Ls = np.float64(0.0001)
-        self.Lrs = np.float64(0.0002)
-        self.delta = np.float64(0.043)
-        self.tau = np.float64(1.689)
-        self.l = np.float64(3.1)
-        self.J = np.float64(2615)
-
-        ###
-        self.M_max = np.float64(200000)
-        self.t0 = np.float64(1)
-        self.t2 = np.float64(1)
-        self.Ur = np.float64(140)
-        self.Urxx = np.float64(62)
-
-        self.width_input = len(self.get_first())
-        self.width_matrix = len(self.get_main_determinant(self.get_first(), 0)[0])
-        self.height_matrix = len(self.get_main_determinant(self.get_first(), 0))
-        
-
-    def get_first(self):
-        return ([0, 0, 648, 100*np.pi, 0])
+        self.width_input = 5
+        self.width_matrix = 3
+        self.height_matrix = 3
 
     def get_main_determinant(self, input_variable, t):
         main_determinant = np.array([[-(2*self.wc*self.wc*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(1 + (-1)*np.sin(np.pi/2 - 2*np.pi/3) - (-1)*np.sin(np.pi/6) - (-1)*(-1)*np.sin(np.pi/6 + 2*np.pi/3)) - self.Ls, -(2*self.wc*self.wc*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(np.sin(np.pi/2 + 2*np.pi/3) + (-1)*np.sin(np.pi/2 - 2*np.pi/3) - (-1)*np.sin(np.pi/6 - 2*np.pi/3) - (-1)*(-1)*np.sin(np.pi/6 + 2*np.pi/3)) + self.Ls, -(2*self.wc*self.wr*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(np.sin(np.pi/2+input_variable[4]) - (-1)*np.sin(np.pi/6-input_variable[4]))],
@@ -161,10 +136,3 @@ class SM(Base_model):
             self.tau = self.secondary_parameters[9]
             self.l = self.secondary_parameters[10]
             self.J = self.secondary_parameters[12]
-
-    def set_control_actions(self):
-        self.list_params = []
-        list_text_control_actions = ["Механический момент, кН*м", "Напряжение возбуждения, В"]
-        self.help_set_control_actions(list_text_control_actions, self.list_params)
-
-
