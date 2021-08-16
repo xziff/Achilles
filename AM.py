@@ -125,5 +125,3 @@ class AM(Base_model):
             self.J = np.float64(self.secondary_parameters[10])
             self.wc = np.float64(23.14)
             self.wr = np.float64(5.71)
-
-        #print(self.p, self.Rc, self.Rr, self.Lcs, self.Lrs, self.l, self.tau, self.delta, self.J, self.wc, self.wr)
