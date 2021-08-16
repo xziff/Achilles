@@ -27,11 +27,11 @@ list_text_secondary_parameters = ["Действующее значение на�
 
 list_text_example_models = [
     "Пользовательский",
-    "Сеть 10 кВ"
-]
+    "Сеть 10 кВ",
+    "Сеть 6 кВ"]
 
 list_example_parameters = [[10.5, 50, 0, 0.02],
-    ]
+    [6, 50, 0, 0.02]]
 
 list_text_control_actions = []
 
