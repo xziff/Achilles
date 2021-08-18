@@ -20,14 +20,12 @@ n_fig = 1
 class Electrical_Bus:
     state_click = 0
     k_expand = 6
-    list_connection = []
-    connectivity_to_bus = 0
     number_of_connection = 0
-    position = 0
 
-    def __init__(self, init_x, init_y, canv, root):
+    def __init__(self, init_x, init_y, position, canv, root):
         self.canv = canv
         self.root = root
+        self.position = position
         self.image_model_data = create_image_for_model("Image/Electrical Bus/" + str(self.position) + ".png")
         self.image_width = self.image_model_data.width()
         self.image_height = self.image_model_data.height()

@@ -19,12 +19,17 @@ def create_image_for_model(pass_obj, k_size):
     return image
 
 class Wire:
-    def __init__(self, canv, x0, y0, text_tag):
+    def __init__(self, canv, x0, y0, text_tag, initial_coords):
         self.text_tag = text_tag
         self.canv = canv
-        self.activity = True
-        self.coords_wire = [[x0, y0], [x0, y0]]
-        self.canvas_object_wire = [canv.create_line(x0, y0, x0, y0, dash = (5, 5), width = 1, fill = "red")]
+        if (initial_coords == None):
+            self.activity = True
+            self.coords_wire = [[x0, y0], [x0, y0]]
+            self.canvas_object_wire = [canv.create_line(x0, y0, x0, y0, dash = (5, 5), width = 1, fill = "red")]
+        else:
+            self.activity = True
+            self.coords_wire = initial_coords
+            self.canvas_object_wire = []
 
     def move_end_wire(self, m_x, m_y, list_nodes, WIDTH, HEIGHT):
         if self.activity:
@@ -124,7 +129,7 @@ class Base_model:
 
     def __init__(self, init_x, init_y, canv, root, path_to_image_model, dxdy, position, list_nodes, 
     list_graph, list_text_secondary_parameters, initial_secondary_parameters, list_text_example_models, list_example_parameters,
-    list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions):
+    list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires):
 
         self.mu0 = np.float64(4*np.pi*10**(-7))
         self.list_text_control_actions = list_text_control_actions
@@ -170,7 +175,17 @@ class Base_model:
         self.y = init_y
         self.image_model = self.canv.create_image(self.x,self.y,image = self.image_model_data, anchor = 'nw')
 
-        self.list_wires = ["not exist"] * len(self.list_nodes)
+        if (initial_list_wires == None):
+            self.list_wires = ["not exist"] * len(self.list_nodes)
+        else:
+            self.list_wires = []
+            for i in range(len(initial_list_wires)):
+                if (initial_list_wires[i] != "not exist"):
+                    dx, dy = self.connection_coords[i]
+                    self.list_wires.append(Wire(self.canv, self.x + dx, self.y + dy, self.list_nodes[i], initial_list_wires[i]))
+                else:
+                    self.list_wires.append("not exist")
+
         self.state_click = 0 #
         self.k_click = 0.0 #
         self.quad_indication_create = False #
@@ -231,10 +246,10 @@ class Base_model:
             if ((m_x > self.x + dx - size_area_indication) and (m_y > self.y + dy - size_area_indication)
             and (m_x < self.x + dx + size_area_indication) and (m_y < self.y + dy + size_area_indication)):
                 if (self.list_wires[i] == "not exist"):
-                    self.list_wires[i] = Wire(self.canv, self.x + dx, self.y + dy, self.list_nodes[i])
+                    self.list_wires[i] = Wire(self.canv, self.x + dx, self.y + dy, self.list_nodes[i], None)
                 else:
                     self.list_wires[i].delete_wire()
-                    self.list_wires[i] = Wire(self.canv, self.x + dx, self.y + dy, self.list_nodes[i])
+                    self.list_wires[i] = Wire(self.canv, self.x + dx, self.y + dy, self.list_nodes[i], None)
 
     def rotation(self, m_x, m_y):
         if (self.state_click == 1):
@@ -371,16 +386,17 @@ class Base_model:
             list_t = []
             list_p = []
 
-            for i in range(len(self.list_text_control_actions)):
+            i = 0
+            for key, item in self.list_text_control_actions.items():
                 list_t.append([])
                 list_p.append([])
                 frame=Frame(master = control_actions_window, bg= "white")
                 frame.pack(side = TOP, pady = (10, 0))
-                label = Label(master= frame, text=self.list_text_control_actions[i], font=('GOST Type A', 16), bg= "white")
+                label = Label(master= frame, text=key, font=('GOST Type A', 16), bg= "white")
                 label.grid(row=0, column=0, columnspan=num_col*2 + 1)
-                label = Label(master= frame, text="Время, с", font=('GOST Type A', 16), bg= "white")
+                label = Label(master= frame, text= item[0], font=('GOST Type A', 16), bg= "white")
                 label.grid(row=2, column=0)
-                label = Label(master= frame, text="Параметр", font=('GOST Type A', 16), bg= "white")
+                label = Label(master= frame, text= item[1], font=('GOST Type A', 16), bg= "white")
                 label.grid(row=4, column=0)
 
                 for j in range(num_col):
@@ -408,7 +424,8 @@ class Base_model:
 
                 ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=1, columnspan=num_col*2 + 1, sticky='ew')  
                 ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=3, columnspan=num_col*2 + 1, sticky='ew')
-                ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=5, columnspan=num_col*2 + 1, sticky='ew')         
+                ttk.Separator(frame, orient=HORIZONTAL).grid(column=0, row=5, columnspan=num_col*2 + 1, sticky='ew')
+                i += 1         
 
         frame=Frame(master = control_actions_window, bg= "white")
         frame.pack(side = TOP, pady = (10, 0))
@@ -432,6 +449,12 @@ class Base_model:
             entry = Entry(frame, width=5,
                 font=('GOST Type A', 14), relief = FLAT, justify = CENTER, textvariable = list_SV_initial_conditions[-1])
             entry.grid(row=4, column=i*2) 
+
+        b = Button(master = control_actions_window, text="Дополнительная информация", command= self.set_control_actions_help, bg = "white", font=('GOST Type A', 14))
+        b.pack(side = TOP, pady = (10, 0))
+
+    def set_control_actions_help(self):
+        pass
 
     def delete_model(self):
         self.canv.delete(self.image_model)

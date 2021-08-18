@@ -1,7 +1,10 @@
 from tkinter import *
+from tkinter import ttk
+import os
 import tkinter.font as font
 from tree_window import get_tree_window, add_model
 from calc import calculations
+from save_and_load import save_models_nodes, load_models_nodes
 
 #Массив узлов
 list_nodes = []
@@ -21,6 +24,60 @@ def b1_command():
         add_model(list_models, list_nodes, tree.item(item)['text'], WIDTH, HEIGHT, canv, root)
         tree_window.destroy()
     tree.bind("<Double-1>", OnDoubleClick)
+
+def start():
+    calculations(list_nodes, list_models)
+
+def save_scheme():
+    def bc():
+        save_models_nodes(SV.get(), list_models, list_nodes)
+        save_window.destroy()
+    save_window = Toplevel(root, bg = "white")
+    save_window.title("Сохранить файл")
+    label = Label(master= save_window, text="Имя файла в папке '/saves_schemes'", font=('GOST Type A', 16), bg= "white")
+    SV = StringVar()
+    entry = Entry(save_window, width=15, font=('GOST Type A', 14), textvariable = SV)          
+    b4 = Button(master = save_window, text="Сохранить", command= bc, bg = "white", font = font.Font(family = "GOST Type A"))
+    label.pack(padx = 10, pady = 10)
+    entry.pack(padx = 10, pady = 10)
+    b4.pack(padx = 10, pady = 10)
+
+
+def load_scheme():
+    for i, k, files in os.walk("./saves_schemes"):
+        file_names = files
+
+    def bc():
+        global list_models, list_nodes
+        for i in list_models:
+            for j in i:
+                j.delete_model()
+        for i in list_nodes:
+            i.delete_node(list_models)
+
+        list_nodes = []
+        list_models = []
+        list_models.append([]) #Трансформатор
+        list_models.append([]) #Синхронная машина
+        list_models.append([]) #Асинхронная машина
+        list_models.append([]) #Система
+        
+        load_models_nodes(list_files.get(), list_models, list_nodes, canv, root)
+        load_window.destroy()
+
+    load_window = Toplevel(root, bg = "white")
+    load_window.title("Выбор файла для загрузки")
+    if (len(file_names) == 0):
+        label = Label(master= load_window, text="Нет файлов для загрузки", font=('GOST Type A', 16), bg= "white")
+        label.pack()
+    else:
+        label = Label(master= load_window, text="Файлы в папке '/saves_schemes'", font=('GOST Type A', 16), bg= "white")
+        label.pack(padx = 10, pady = 10)
+        list_files = ttk.Combobox(load_window, values = file_names ,state="readonly", font=('GOST Type A', 16), width= 16)
+        list_files.current(0)
+        list_files.pack(padx = 10, pady = 10)
+        b4 = Button(master = load_window, text="Загрузить схему", command= bc, bg = "white", font = font.Font(family = "GOST Type A"))
+        b4.pack(padx = 10, pady = 10)
 
 #Команды кнопок на клавиатуре и мыши
 def click_1(event):
@@ -78,9 +135,6 @@ def get_list_nodes(event):
     for i in list_nodes:
         print(i.list_connection)
     print("#####################################################")
-
-def start():
-    calculations(list_nodes, list_models)
 
 def view(event):
     for i in list_models:
@@ -161,6 +215,14 @@ b1.pack(side = LEFT, padx = 10, pady = 10)
 #Кнопка для расчета
 b2 = Button(master = frame_menu, text="Начать расчет", command= start, height=HEIGHT_MENU, bg = "white", font = font.Font(family = "GOST Type A"))
 b2.pack(side = LEFT, padx = 10, pady = 10)
+
+#Кнопка для сохранения схемы
+b3 = Button(master = frame_menu, text="Сохранить схему", command= save_scheme, height=HEIGHT_MENU, bg = "white", font = font.Font(family = "GOST Type A"))
+b3.pack(side = RIGHT, padx = 10, pady = 10)
+
+#Кнопка для загрузки схемы
+b4 = Button(master = frame_menu, text="Загрузить схему", command= load_scheme, height=HEIGHT_MENU, bg = "white", font = font.Font(family = "GOST Type A"))
+b4.pack(side = RIGHT, padx = 10, pady = 10)
 
 #Бинды кнопок
 canv.bind('<Button-1>', click_1)

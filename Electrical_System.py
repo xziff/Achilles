@@ -33,7 +33,7 @@ list_text_example_models = [
 list_example_parameters = [[10.5, 50, 0, 0.02],
     [6, 50, 0, 0.02]]
 
-list_text_control_actions = []
+list_text_control_actions = {}
 
 list_text_initial_conditions = ["Ток фазы 'А', А",
     "Ток фазы 'B', А",
@@ -41,15 +41,10 @@ list_text_initial_conditions = ["Ток фазы 'А', А",
 
 class Electrical_System(Base_model):
 
-    def __init__(self, init_x, init_y, canv, root):
+    def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters):
 
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/Electrical System/", coord, 0, list_nodes, list_graph, list_text_secondary_parameters, None, list_text_example_models, list_example_parameters, list_text_control_actions, list_text_initial_conditions, None, None)
-
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/Electrical System/", coord, position, list_nodes, list_graph, list_text_secondary_parameters, initial_secondary_parameters, list_text_example_models, list_example_parameters, list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
         ###
-        self.Uc = np.float64(6060)
-        self.fc = np.float64(50)
-        self.phic = np.float64(0)
-        self.Lc = np.float64(0.02/(314.15))
 
         self.width_input = 3
         self.width_matrix = 3

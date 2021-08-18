@@ -9,23 +9,23 @@ from Electrical_System import Electrical_System
 
 def add_model(mass_model, list_nodes, return_text, WIDTH, HEIGHT, canv, root):
     if (return_text == "Обычный узел"):
-        list_nodes.append(Electrical_Bus(WIDTH, HEIGHT, canv, root))
+        list_nodes.append(Electrical_Bus(WIDTH, HEIGHT, 0, canv, root))
         list_nodes[-1].state_click = 1
         list_nodes[-1].delta_x = list_nodes[-1].image_width/2
         list_nodes[-1].delta_y = list_nodes[-1].image_height/2
     else:
         if (return_text == "Звезда-треугольник-11"):
             m_i = 0
-            mass_model[0].append(Transformator_Z_T_11(WIDTH, HEIGHT, canv, root))
+            mass_model[0].append(Transformator_Z_T_11(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
         elif (return_text == "Синхронная машина"):
             m_i = 1
-            mass_model[1].append(SM(WIDTH, HEIGHT, canv, root))
+            mass_model[1].append(SM(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
         elif (return_text == "Асинхронная машина"):
             m_i = 2
-            mass_model[2].append(AM(WIDTH, HEIGHT, canv, root))
+            mass_model[2].append(AM(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
         elif (return_text == "Система"):
             m_i = 3
-            mass_model[3].append(Electrical_System(WIDTH, HEIGHT, canv, root))
+            mass_model[3].append(Electrical_System(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
         else:
             print("Error")
         mass_model[m_i][-1].state_click = 1

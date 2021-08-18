@@ -68,7 +68,7 @@ list_example_parameters = [[10.5, 63, 0.8, 139.61, 2.118, 0.002, 0.0953, 0.0001,
     [18, 400, 0.95, 439.9616, 1.62, 0.00084, 0.2644, 0.0001, 0.0002, 5.3, 1.29*math.pi/2, 0.0824, 8670]
     ]
 
-list_text_control_actions = ["Механический момент, кН*м", "Напряжение возбуждения, В"]
+list_text_control_actions = {"Механический момент": ["t, с", "M(t), кН*м"], "Напряжение возбуждения": ["t, с", "Uв(t), В"]}
 
 list_text_initial_conditions = ["Ток фазы 'А', А", 
                                     "Ток фазы 'B', А",
@@ -78,8 +78,8 @@ list_text_initial_conditions = ["Ток фазы 'А', А",
 
 class SM(Base_model):
 
-    def __init__(self, init_x, init_y, canv, root):
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/SM/", coord, 0, list_nodes, list_graph, list_text_secondary_parameters, None, list_text_example_models, list_example_parameters, list_text_control_actions, list_text_initial_conditions, None, None)
+    def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters):
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/SM/", coord, position, list_nodes, list_graph, list_text_secondary_parameters, initial_secondary_parameters, list_text_example_models, list_example_parameters, list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
 
         self.width_input = 5
         self.width_matrix = 3

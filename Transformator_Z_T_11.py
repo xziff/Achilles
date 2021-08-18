@@ -140,7 +140,7 @@ list_example_parameters = [[80, 121, 6.3, 310, 85, 11, 0.6],
     [1000, 525, 24, 1800, 570, 14.5, 0.45],
     ]
 
-list_text_control_actions = []
+list_text_control_actions = {}
 
 list_text_initial_conditions = ["Ток фазы 'A' на стороне треугольника, А",
     "Ток фазы 'B' на стороне треугольника, А",
@@ -151,9 +151,9 @@ list_text_initial_conditions = ["Ток фазы 'A' на стороне тре�
 
 class Transformator_Z_T_11(Base_model):
 
-    def __init__(self, init_x, init_y, canv, root):
+    def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters):
 
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/Transformator/", coord, 0, list_nodes, list_graph, list_text_secondary_parameters, None, list_text_example_models, list_example_parameters, list_text_control_actions, list_text_initial_conditions, None, None)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/Transformator/", coord, position, list_nodes, list_graph, list_text_secondary_parameters, initial_secondary_parameters, list_text_example_models, list_example_parameters, list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
 
         self.width_input = 6
         self.width_matrix = 6
