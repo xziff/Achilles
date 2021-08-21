@@ -1,10 +1,14 @@
 import pickle
 
-from Electrical_Bus import Electrical_Bus
-from Transformator_Z_T_11 import Transformator_Z_T_11
-from SM import SM
-from AM import AM
-from Electrical_System import Electrical_System
+import sys
+sys.path.insert(1, '/Models')
+
+from Models.Electrical_Bus import Electrical_Bus
+from Models.Transformator_Z_T_11 import Transformator_Z_T_11
+from Models.SM import SM
+from Models.AM import AM
+from Models.Electrical_System import Electrical_System
+from Models.Switch import Switch
 
 def save_models_nodes(path_str, list_models, list_nodes):
     with open('saves_schemes/' + path_str + '.pickle', 'wb') as f:
@@ -32,6 +36,7 @@ def save_models_nodes(path_str, list_models, list_nodes):
 def load_models_nodes(path_str, list_models, list_nodes, canv, root):
     with open('saves_schemes/' + path_str, 'rb') as f:
         data = pickle.load(f)
+
         for i in data[0]:
             list_models[0].append(Transformator_Z_T_11(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
         for i in data[1]:
@@ -40,6 +45,8 @@ def load_models_nodes(path_str, list_models, list_nodes, canv, root):
             list_models[2].append(AM(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
         for i in data[3]:
             list_models[3].append(Electrical_System(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
+        for i in data[4]:
+            list_models[4].append(Switch(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
 
         data = pickle.load(f)
         for i in data:

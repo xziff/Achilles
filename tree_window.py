@@ -1,11 +1,12 @@
 from tkinter import * 
 from tkinter import ttk
 
-from Electrical_Bus import Electrical_Bus
-from Transformator_Z_T_11 import Transformator_Z_T_11
-from SM import SM
-from AM import AM
-from Electrical_System import Electrical_System
+from Models.Electrical_Bus import Electrical_Bus
+from Models.Transformator_Z_T_11 import Transformator_Z_T_11
+from Models.SM import SM
+from Models.AM import AM
+from Models.Electrical_System import Electrical_System
+from Models.Switch import Switch
 
 def add_model(mass_model, list_nodes, return_text, WIDTH, HEIGHT, canv, root):
     if (return_text == "Обычный узел"):
@@ -26,6 +27,9 @@ def add_model(mass_model, list_nodes, return_text, WIDTH, HEIGHT, canv, root):
         elif (return_text == "Система"):
             m_i = 3
             mass_model[3].append(Electrical_System(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
+        elif (return_text == "Вылючатель"):
+            m_i = 4
+            mass_model[4].append(Switch(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
         else:
             print("Error")
         mass_model[m_i][-1].state_click = 1
@@ -66,6 +70,8 @@ def get_tree_window(root):
     tree.insert('', END, text='Другое', iid=7, open=False, tags= ('H',))
     tree.insert('', END, text='Система', iid=8, open=False)
     tree.move(8, 7, 0)
+    tree.insert('', END, text='Вылючатель', iid=9, open=False)
+    tree.move(9, 7, 0)
 
     tree.grid(row=0, column=0, sticky='nsew')
 

@@ -15,6 +15,7 @@ list_models.append([]) #Трансформатор
 list_models.append([]) #Синхронная машина
 list_models.append([]) #Асинхронная машина
 list_models.append([]) #Система
+list_models.append([]) #Выключатель
 
 #Команды кнопок на экране
 def b1_command():
@@ -61,6 +62,7 @@ def load_scheme():
         list_models.append([]) #Синхронная машина
         list_models.append([]) #Асинхронная машина
         list_models.append([]) #Система
+        list_models.append([]) #Выключатель
         
         load_models_nodes(list_files.get(), list_models, list_nodes, canv, root)
         load_window.destroy()
@@ -117,7 +119,7 @@ def mouse_motion(event):
                 for k in j.list_wires:
                     if (k != "not exist"):
                         k.move_end_wire(event.x, event.y, list_nodes, WIDTH, HEIGHT)
-
+ 
 
     for i in list_nodes:
         i.move_model(event.x, event.y)

@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from scipy. integrate import odeint
 import numpy as np
 
-from base_model import Base_model
+from Models.base_model import Base_model
 
 def line_func(list_points, t):
     for i in range(len(list_points[0]) - 1):
@@ -24,7 +24,7 @@ coord = [
 
 list_nodes = ["Q:ON_SWITCH"]
 
-list_graph = [0, 3, 6]
+list_graph = [0, 1, 2, 3, 6]
 
 list_text_secondary_parameters = ["Номинальное напряжение, кВ:",
     "Число пар полюсов, шт:",
@@ -111,6 +111,7 @@ class AM(Base_model):
                             (-1*1000*line_func(self.list_params[0], (100*np.pi/self.p - input_variable[6])/(100*np.pi/self.p)*100) - Melmag)/self.J,
                             input_variable[6]
                             ], dtype = self.data_type) 
+        
         return additional_variable
 
     def set_primary_parameters(self):

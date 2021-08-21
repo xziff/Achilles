@@ -15,7 +15,6 @@ def create_image_for_model(pass_obj, k_size):
     buff_image = ImageTk.PhotoImage(Image.open(pass_obj))
     width_image = buff_image.width()/k_size
     image = ImageTk.PhotoImage(Image.open(pass_obj).resize((int(width_image), int((width_image)*buff_image.height()/buff_image.width())), Image.ANTIALIAS))
-    #imagesprite2 = canv.create_image(WIDTH/2,HEIGHT/2,image=image2)
     return image
 
 class Wire:
@@ -30,6 +29,8 @@ class Wire:
             self.activity = True
             self.coords_wire = initial_coords
             self.canvas_object_wire = []
+        size_con = 4
+        self.quad_con = self.canv.create_rectangle(self.coords_wire[0][0] - size_con, self.coords_wire[0][1] - size_con, self.coords_wire[0][0] + size_con, self.coords_wire[0][1] + size_con, width = 2, fill = "black")
 
     def move_end_wire(self, m_x, m_y, list_nodes, WIDTH, HEIGHT):
         if self.activity:
@@ -123,6 +124,7 @@ class Wire:
     def delete_wire(self):
         for i in self.canvas_object_wire:
             self.canv.delete(i)
+        self.canv.delete(self.quad_con)
         self.coords_wire = []
 
 class Base_model:
@@ -147,6 +149,7 @@ class Base_model:
                 self.list_params.append([[], []])
         else:
             self.list_params = initial_control_actions
+            self.corrent_list_params()
         if (initial_secondary_parameters == None):
             self.secondary_parameters = ["Нет данных"] * len(self.list_text_secondary_parameters)
         else:
@@ -371,6 +374,7 @@ class Base_model:
                         if (list_p[i][j].get() != ''):
                             self.list_params[-1][-1].append(float(list_p[i][j].get()))
 
+            self.corrent_list_params()
 
             self.list_initial_conditions = []
             for i in range(len(self.list_text_initial_conditions)):
@@ -454,6 +458,9 @@ class Base_model:
         b.pack(side = TOP, pady = (10, 0))
 
     def set_control_actions_help(self):
+        pass
+    
+    def corrent_list_params(self):
         pass
 
     def delete_model(self):

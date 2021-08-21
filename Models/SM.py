@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from scipy. integrate import odeint
 import numpy as np
 
-from base_model import Base_model
+from Models.base_model import Base_model
 
 def line_func(list_points, t):
     for i in range(len(list_points[0]) - 1):

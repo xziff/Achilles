@@ -45,22 +45,19 @@ def communacation_matrix(list_nodes, list_models, main_list):
                         for p in range(len(list_models[main_list[j][0]][main_list[j][1]].get_voltage_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0])[o])):
                             help_voltage_matrix[o + wait_index].append(list_models[main_list[j][0]][main_list[j][1]].get_voltage_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0])[o][p])
                     wait_index += len(list_models[main_list[j][0]][main_list[j][1]].get_voltage_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0]))
+                    for o in range(len(list_models[main_list[j][0]][main_list[j][1]].get_current_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0]))):
+                        for p in range(len(list_models[main_list[j][0]][main_list[j][1]].get_current_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0])[o])):
+                            help_current_matrix[o].append(list_models[main_list[j][0]][main_list[j][1]].get_current_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0])[o][p])
+
                 else:
                     for o in range(list_models[main_list[j][0]][main_list[j][1]].height_matrix):
                         help_voltage_matrix.append([])
                         for p in range(3):
                             help_voltage_matrix[o + wait_index].append(0)
                     wait_index += list_models[main_list[j][0]][main_list[j][1]].height_matrix
-                
-                if ((list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]] != "none") and (list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[1] == "ON_SWITCH")):
-                    for o in range(len(list_models[main_list[j][0]][main_list[j][1]].get_current_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0]))):
-                        for p in range(len(list_models[main_list[j][0]][main_list[j][1]].get_current_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0])[o])):
-                            help_current_matrix[o].append(list_models[main_list[j][0]][main_list[j][1]].get_current_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0])[o][p])
-                else:
                     for o in range(3):
                         for p in range(list_models[main_list[j][0]][main_list[j][1]].width_matrix):
                             help_current_matrix[o].append(0)
-
 
             width_matrix_buff = 0
             for n in range(len(help_voltage_matrix)):
@@ -96,7 +93,80 @@ def communacation_matrix(list_nodes, list_models, main_list):
 
             for ii in help_current_matrix:
                 all_current_matrix.append(ii[0:])
-    
+
+    for i in range(len(list_nodes)):
+        help_voltage_matrix = []    
+        help_current_matrix = [[], [], []] 
+        wait_index = 0
+        if (list_nodes[i] != "Deleted"):
+            for j in range(len(main_list)):
+                if ((list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]] != "none") and (list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[1] == "OFF_SWITCH")):
+                    for o in range(len(list_models[main_list[j][0]][main_list[j][1]].get_voltage_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0]))):
+                        help_voltage_matrix.append([])
+                        for p in range(len(list_models[main_list[j][0]][main_list[j][1]].get_voltage_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0])[o])):
+                            help_voltage_matrix[o + wait_index].append(list_models[main_list[j][0]][main_list[j][1]].get_voltage_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0])[o][p])
+                    wait_index += len(list_models[main_list[j][0]][main_list[j][1]].get_voltage_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0]))
+                    for o in range(len(list_models[main_list[j][0]][main_list[j][1]].get_current_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0]))):
+                        for p in range(len(list_models[main_list[j][0]][main_list[j][1]].get_current_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0])[o])):
+                            help_current_matrix[o].append(list_models[main_list[j][0]][main_list[j][1]].get_current_matrix(list_nodes[i].list_connection[main_list[j][0]][main_list[j][1]].split(":")[0])[o][p])
+
+                else:
+                    for o in range(list_models[main_list[j][0]][main_list[j][1]].height_matrix):
+                        help_voltage_matrix.append([])
+                        for p in range(3):
+                            help_voltage_matrix[o + wait_index].append(0)
+                    wait_index += list_models[main_list[j][0]][main_list[j][1]].height_matrix
+                    for o in range(3):
+                        for p in range(list_models[main_list[j][0]][main_list[j][1]].width_matrix):
+                            help_current_matrix[o].append(0)
+
+            width_matrix_buff = 0
+            for n in range(len(help_voltage_matrix)):
+                if (len(help_voltage_matrix[n]) > width_matrix_buff):
+                    width_matrix_buff = len(help_voltage_matrix[n])
+            for n in range(len(help_voltage_matrix)):
+                while (len(help_voltage_matrix[n]) != width_matrix_buff):
+                    help_voltage_matrix[n].append(0)
+
+            mass_repeat = []
+            for ii in range(len(help_voltage_matrix[0])):
+                repeat_num = 0
+                for jj in range(len(help_voltage_matrix)):
+                    if ((help_voltage_matrix[jj][ii] == 1) or (help_voltage_matrix[jj][ii] == -1)):
+                        repeat_num = 1
+                if (repeat_num == 0):
+                    mass_repeat.append(ii)
+            
+            buff_mass_repeat = []
+            buf_width = len(mass_repeat)
+            for i in range(len(mass_repeat)):
+                buff_mass_repeat.append(mass_repeat[buf_width-1 - i])
+
+            for ii in buff_mass_repeat:
+                for jj in range(len(help_voltage_matrix)):
+                    del help_voltage_matrix[jj][ii]
+
+            if (len(help_voltage_matrix[0]) == 2):
+                del help_current_matrix[-1]
+            if (len(help_voltage_matrix[0]) == 1):
+                del help_current_matrix[-2]
+                del help_current_matrix[-1]
+            if (len(help_voltage_matrix[0]) == 0):
+                del help_current_matrix[-2]
+                del help_current_matrix[-1]
+                del help_current_matrix[0]
+
+            if (len(all_voltage_matrix) == 0):
+                for ii in range(len(help_voltage_matrix)):
+                    all_voltage_matrix.append([])
+
+            for ii in range(len(help_voltage_matrix)):
+                for jj in range(len(help_voltage_matrix[ii])):
+                    all_voltage_matrix[ii].append(help_voltage_matrix[ii][jj])
+
+            for ii in help_current_matrix:
+                all_current_matrix.append(ii[0:])
+
     for ii in range(len(all_current_matrix)):
         for j in range(len(all_voltage_matrix[0])):
             all_current_matrix[ii].append(0)
@@ -116,8 +186,8 @@ def return_graphs(main_list, list_models, results, t):
 
 
 def calculations(list_nodes, list_models):
-    t_max = 4
-    t_del = 500000
+    t_max = 8
+    t_del = 1000000
     t = np.linspace(0, t_max, t_del)
 
     main_list = get_main_list(list_nodes, list_models)
@@ -126,12 +196,41 @@ def calculations(list_nodes, list_models):
 
     all_voltage_matrix, all_current_matrix = communacation_matrix(list_nodes, list_models, main_list)
 
+    time_interrupt = []
+    for i in list_models[4]:
+        for j in i.get_interrupt_time():
+            time_interrupt.append(j)
+    time_interrupt = list(set(time_interrupt))
+    time_interrupt.sort()
+    flag_time_interrupt = [False] * len(time_interrupt)
+
     def f(y, t):
+        global all_voltage_matrix, all_current_matrix
         wait_index = 0
         current_index = [0, 0]
         ouput_matrix = []
 
         bool_start = False
+
+        for i in list_models[4]:
+            i.check_switch(t)
+
+        ###
+        for i in range(len(time_interrupt)):
+            if (t >= time_interrupt[i]):
+                current_interrupt_time_index = i
+            else:
+                break
+        if not flag_time_interrupt[current_interrupt_time_index]:
+            for i in range(len(time_interrupt)):
+                flag_time_interrupt[i] = False
+            flag_time_interrupt[current_interrupt_time_index] = True
+
+            for i in list_nodes:
+                i.control_connection(list_models)
+
+            all_voltage_matrix, all_current_matrix = communacation_matrix(list_nodes, list_models, main_list)
+        ###
 
         for type_model, number_moder in main_list:
             width_matrix = list_models[type_model][number_moder].width_matrix
@@ -173,8 +272,8 @@ def calculations(list_nodes, list_models):
                 ouput_matrix.append(list_models[type_model][number_moder].get_additional_variable(y[wait_index:(wait_index+list_models[type_model][number_moder].width_input)], t)[m])
             wait_index += list_models[type_model][number_moder].width_input
 
-        print(str(round(t/t_max*100, 3)), end = "\r")
-    
+        #print(str(round(t/t_max*100, 3)), end = "\r")
+        print(t)
         return ouput_matrix
 
     results = odeint(f, y0, t)

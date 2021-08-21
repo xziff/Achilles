@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from scipy. integrate import odeint
 import numpy as np
 
-from base_model import Base_model
+from Models.base_model import Base_model
 
 coord = [
     [[16, 275]],
