@@ -33,11 +33,11 @@ list_text_control_actions = {"Позиции выключателя": ["Врем
 list_text_initial_conditions = ["Ток фазы 'А' статора, А",
     "Ток фазы 'B' статора, А"]
 
-class Switch(Base_model):
+class SS(Base_model):
 
     def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters):
 
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/Switch/", coord, position, list_nodes, list_graph, list_text_secondary_parameters, initial_secondary_parameters, list_text_example_models, list_example_parameters, list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/SS/", coord, position, list_nodes, list_graph, list_text_secondary_parameters, initial_secondary_parameters, "SS", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
 
         self.width_input = 2
         self.width_matrix = 2

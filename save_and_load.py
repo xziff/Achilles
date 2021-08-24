@@ -1,14 +1,11 @@
 import pickle
 
-import sys
-sys.path.insert(1, '/Models')
-
 from Models.Electrical_Bus import Electrical_Bus
-from Models.Transformator_Z_T_11 import Transformator_Z_T_11
-from Models.SM import SM
-from Models.AM import AM
-from Models.Electrical_System import Electrical_System
-from Models.Switch import Switch
+from Models.DWT_YD_11 import DWT_YD_11
+from Models.NPSG_Y import NPSG_Y
+from Models.WRIM import WRIM
+from Models.ES import ES
+from Models.SS import SS
 
 def save_models_nodes(path_str, list_models, list_nodes):
     with open('saves_schemes/' + path_str + '.pickle', 'wb') as f:
@@ -38,15 +35,15 @@ def load_models_nodes(path_str, list_models, list_nodes, canv, root):
         data = pickle.load(f)
 
         for i in data[0]:
-            list_models[0].append(Transformator_Z_T_11(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
+            list_models[0].append(DWT_YD_11(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
         for i in data[1]:
-            list_models[1].append(SM(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
+            list_models[1].append(NPSG_Y(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
         for i in data[2]:
-            list_models[2].append(AM(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
+            list_models[2].append(WRIM(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
         for i in data[3]:
-            list_models[3].append(Electrical_System(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
+            list_models[3].append(ES(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
         for i in data[4]:
-            list_models[4].append(Switch(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
+            list_models[4].append(SS(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
 
         data = pickle.load(f)
         for i in data:

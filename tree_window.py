@@ -2,11 +2,11 @@ from tkinter import *
 from tkinter import ttk
 
 from Models.Electrical_Bus import Electrical_Bus
-from Models.Transformator_Z_T_11 import Transformator_Z_T_11
-from Models.SM import SM
-from Models.AM import AM
-from Models.Electrical_System import Electrical_System
-from Models.Switch import Switch
+from Models.DWT_YD_11 import DWT_YD_11
+from Models.NPSG_Y import NPSG_Y
+from Models.WRIM import WRIM
+from Models.ES import ES
+from Models.SS import SS
 
 def add_model(mass_model, list_nodes, return_text, WIDTH, HEIGHT, canv, root):
     if (return_text == "Обычный узел"):
@@ -17,19 +17,19 @@ def add_model(mass_model, list_nodes, return_text, WIDTH, HEIGHT, canv, root):
     else:
         if (return_text == "Звезда-треугольник-11"):
             m_i = 0
-            mass_model[0].append(Transformator_Z_T_11(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
+            mass_model[0].append(DWT_YD_11(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
         elif (return_text == "Синхронная машина"):
             m_i = 1
-            mass_model[1].append(SM(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
+            mass_model[1].append(NPSG_Y(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
         elif (return_text == "Асинхронная машина"):
             m_i = 2
-            mass_model[2].append(AM(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
+            mass_model[2].append(WRIM(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
         elif (return_text == "Система"):
             m_i = 3
-            mass_model[3].append(Electrical_System(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
+            mass_model[3].append(ES(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
         elif (return_text == "Вылючатель"):
             m_i = 4
-            mass_model[4].append(Switch(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
+            mass_model[4].append(SS(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
         else:
             print("Error")
         mass_model[m_i][-1].state_click = 1

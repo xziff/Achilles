@@ -2,9 +2,11 @@ from tkinter import *
 from tkinter import ttk
 import os
 import tkinter.font as font
+
 from tree_window import get_tree_window, add_model
 from calc import calculations
 from save_and_load import save_models_nodes, load_models_nodes
+
 
 #Массив узлов
 list_nodes = []

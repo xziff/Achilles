@@ -20,9 +20,8 @@ list_nodes = ["Q:ON_SWITCH"]
 list_graph = [0, 1]
 
 list_text_secondary_parameters = ["Действующее значение напряженя, кВ:",
-    "Частота, Гц:",
-    "Начальная фаза напряжения, градус:",
     "Индуктивное сопротивление сети, Ом:",
+    "Начальная фаза напряжения, градус:"
  ]
 
 list_text_example_models = [
@@ -39,11 +38,11 @@ list_text_initial_conditions = ["Ток фазы 'А', А",
     "Ток фазы 'B', А",
     "Ток фазы 'C', А",]
 
-class Electrical_System(Base_model):
+class ES(Base_model):
 
     def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters):
 
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/Electrical System/", coord, position, list_nodes, list_graph, list_text_secondary_parameters, initial_secondary_parameters, list_text_example_models, list_example_parameters, list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/ES/", coord, position, list_nodes, list_graph, list_text_secondary_parameters, initial_secondary_parameters, "ES", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
         ###
 
         self.width_input = 3
@@ -86,6 +85,6 @@ class Electrical_System(Base_model):
     def set_primary_parameters(self):
         if (self.secondary_parameters != ["Нет данных"] * len(self.list_text_secondary_parameters)):
             self.Uc = np.float64(self.secondary_parameters[0] * 1000/ np.sqrt(3))
-            self.fc = np.float64(self.secondary_parameters[1])
+            self.fc = 50
             self.phic = np.float64(self.secondary_parameters[2] * np.pi / 180)
-            self.Lc = np.float64(self.secondary_parameters[3]/(2*np.pi*self.fc))
+            self.Lc = np.float64(self.secondary_parameters[1]/(2*np.pi*self.fc))

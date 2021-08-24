@@ -1,4 +1,5 @@
 import math
+import pickle
 from tkinter import *
 from tkinter import ttk
 from PIL import ImageTk, Image
@@ -32,18 +33,13 @@ list_text_secondary_parameters = ["Номинальное напряжение, 
     "Коэффициент трансформации:",
     "Активное сопротивление обмотки статора, Ом:",
     "Активное сопротивление обмотки ротора, Ом:",
-    "Индуктивность поля рассеяния обмотки статора, Гн:",
-    "Индуктивность поля рассеяния обмотки ротора, Гн:",
+    "Индуктивное сопротивление рассеяния обмотки статора, Ом:",
+    "Индуктивное сопротивление рассеяния рассеяния обмотки ротора, Ом:",
     "Длина машины, м:",
-    "Полюсное деление машины, м:",
+    "Внутренний диаметр статора, м:",
     "Длина воздушного зазора, м:",
     "Момент инерции ротора, кг*м2:"]
 
-list_text_example_models = [
-    "Пользовательский",
-    "АК-2000-6"]
-
-list_example_parameters = [[6, 3, 50.8, 4.05, 0.133, 0.00954,  0.0004776, 0.0003096, 0.57, np.pi*0.795/6, 0.0018, 200]]
 
 list_text_control_actions = {"Нагрузочный момент": ["s, %", "M(s), кН*м"], "Сопротивление реостата, доли Rr": ["s, %", "N(s), о.е."]}
 
@@ -56,11 +52,11 @@ list_text_initial_conditions = ["Ток фазы 'А' статора, А",
     "Частота вращения ротора, рад/с",
     "Угол поворота ротора, рад"]
 
-class AM(Base_model):
+class WRIM(Base_model):
 
     def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters):
 
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/AM/", coord, position, list_nodes, list_graph, list_text_secondary_parameters, initial_secondary_parameters, list_text_example_models, list_example_parameters, list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/WRIM/", coord, position, list_nodes, list_graph, list_text_secondary_parameters, initial_secondary_parameters, "WRIM", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
 
         self.width_input = 8
         self.width_matrix = 6
@@ -106,7 +102,7 @@ class AM(Base_model):
             return current_matrix
 
     def get_additional_variable(self, input_variable, t):
-        Melmag = self.p*2*self.p*self.tau/np.pi*self.l*self.wr*(input_variable[3]*B_delta(input_variable[0], input_variable[1], input_variable[2], input_variable[3], input_variable[4], input_variable[5], self.tau/np.pi*input_variable[7]*self.p-self.tau/2, input_variable[7], self.mu0, self.delta, self.wc, self.wr, self.tau, self.p)+input_variable[4]*B_delta(input_variable[0], input_variable[1], input_variable[2], input_variable[3], input_variable[4], input_variable[5], self.tau/np.pi*input_variable[7]*self.p+self.tau/6, input_variable[7], self.mu0, self.delta, self.wc, self.wr, self.tau, self.p)+input_variable[5]*B_delta(input_variable[0], input_variable[1], input_variable[2], input_variable[3], input_variable[4], input_variable[5], self.tau/np.pi*input_variable[7]*self.p-7*self.tau/6, input_variable[7], self.mu0, self.delta, self.wc, self.wr, self.tau, self.p))
+        Melmag = self.p*self.D*self.l*self.wr*(input_variable[3]*B_delta(input_variable[0], input_variable[1], input_variable[2], input_variable[3], input_variable[4], input_variable[5], self.tau/np.pi*input_variable[7]*self.p-self.tau/2, input_variable[7], self.mu0, self.delta, self.wc, self.wr, self.tau, self.p)+input_variable[4]*B_delta(input_variable[0], input_variable[1], input_variable[2], input_variable[3], input_variable[4], input_variable[5], self.tau/np.pi*input_variable[7]*self.p+self.tau/6, input_variable[7], self.mu0, self.delta, self.wc, self.wr, self.tau, self.p)+input_variable[5]*B_delta(input_variable[0], input_variable[1], input_variable[2], input_variable[3], input_variable[4], input_variable[5], self.tau/np.pi*input_variable[7]*self.p-7*self.tau/6, input_variable[7], self.mu0, self.delta, self.wc, self.wr, self.tau, self.p))
         additional_variable = np.array([
                             (-1*1000*line_func(self.list_params[0], (100*np.pi/self.p - input_variable[6])/(100*np.pi/self.p)*100) - Melmag)/self.J,
                             input_variable[6]
@@ -118,17 +114,22 @@ class AM(Base_model):
         if (self.secondary_parameters != ["Нет данных"] * len(self.list_text_secondary_parameters)):
             self.Un = np.float64(self.secondary_parameters[0]*1000)
             self.p = np.float64(self.secondary_parameters[1])
-            self.Rc = np.float64(self.secondary_parameters[4])
-            self.Rr = np.float64(self.secondary_parameters[5])
-            self.Lcs = np.float64(self.secondary_parameters[6])
-            self.Lrs = np.float64(self.secondary_parameters[7])
-            self.l = np.float64(self.secondary_parameters[8])
-            self.tau = np.float64(self.secondary_parameters[9])
-            self.delta = np.float64(self.secondary_parameters[10])
-            self.J = np.float64(self.secondary_parameters[11])
-            self.wc = np.float64(23.14)
-            self.wr = np.float64(5.71)
 
+            C = (self.secondary_parameters[2] + np.sqrt(self.secondary_parameters[2]**2 + 4*self.secondary_parameters[2]*self.secondary_parameters[6]))/(2*self.secondary_parameters[2])
+            self.Rc = self.secondary_parameters[4]/C
+            self.Rr = self.secondary_parameters[5]/C/self.secondary_parameters[3]**2
+
+            self.Lcs = self.secondary_parameters[6]/C/(100*np.pi)
+            self.Lrs = self.secondary_parameters[7]/C/self.secondary_parameters[3]**2/(100*np.pi)
+
+            self.l = np.float64(self.secondary_parameters[8])
+            self.D = np.float64(self.secondary_parameters[9])
+            self.delta = np.float64(self.secondary_parameters[10])
+            self.tau = np.pi*self.D/(2*self.p)
+
+            self.wc = np.sqrt(self.secondary_parameters[2]*self.delta*np.pi/(4*1*3*50*self.mu0*self.tau*self.l*self.p))
+            self.wr = self.wc / self.secondary_parameters[3]
+    
     def set_control_actions_help(self):
         s = np.linspace(-0.5, 1, 1000)
         M = []

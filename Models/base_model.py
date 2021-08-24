@@ -1,4 +1,5 @@
 import math
+import pickle
 from tkinter import *
 from tkinter import ttk
 from PIL import ImageTk, Image
@@ -130,14 +131,21 @@ class Wire:
 class Base_model:
 
     def __init__(self, init_x, init_y, canv, root, path_to_image_model, dxdy, position, list_nodes, 
-    list_graph, list_text_secondary_parameters, initial_secondary_parameters, list_text_example_models, list_example_parameters,
+    list_graph, list_text_secondary_parameters, initial_secondary_parameters, name_model,
     list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires):
 
         self.mu0 = np.float64(4*np.pi*10**(-7))
         self.list_text_control_actions = list_text_control_actions
         self.list_text_initial_conditions = list_text_initial_conditions
-        self.list_example_parameters = list_example_parameters
-        self.list_text_example_models = list_text_example_models
+
+        with open('Dictionary/' + name_model + '.pickle', 'rb') as f:
+            data = pickle.load(f)
+            self.list_text_example_models = ["Пользовательский"]
+            self.list_example_parameters = []
+            for key, item in data.items():
+                self.list_text_example_models.append(key)
+                self.list_example_parameters.append(item)
+
         self.list_text_secondary_parameters = list_text_secondary_parameters
         if (initial_initial_conditions == None):
             self.list_initial_conditions = [0] * len(self.list_text_initial_conditions)

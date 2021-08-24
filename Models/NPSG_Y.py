@@ -35,14 +35,13 @@ list_graph = [0, 2, 3]
 list_text_secondary_parameters = ["Номинальное напряжение, кВ:",
     "Номинальная активная мощность, МВт:",
     "Коэффициент мощности:",
-    "Номинальное напряжение возбуждения, В:",
-    "Сихнронное индуктиновное сопротивление, Ом:",
-    "Активное сопротивление обмотки статора, мОм:",
+    "Номинальный ток возбуждения, В:",
+    "Сихнронное индуктиновное сопротивление, о.е.:",
+    "Активное сопротивление обмотки статора, Ом:",
     "Активное сопротивление обмотки возбуждения, Ом:",
-    "Индуктивность поля рассеяния обмотки статора, мГн:",
-    "Индуктивность поля рассеяния обмотки ротора, мГн:",
+    "Индуктивное сопротивление рассеяния обмотки статора, о.е.:",
     "Длина машины, м:",
-    "Полюсное деление машины, м:",
+    "Внутренний диаметр статора, м:",
     "Длина воздушного зазора, м:",
     "Момент инерции ротора, кг*м2:"
  ]
@@ -76,10 +75,10 @@ list_text_initial_conditions = ["Ток фазы 'А', А",
                                     "Частота вращения ротора, рад/с",
                                     "Угол поворота ротора, рад", ]
 
-class SM(Base_model):
+class NPSG_Y(Base_model):
 
     def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters):
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/SM/", coord, position, list_nodes, list_graph, list_text_secondary_parameters, initial_secondary_parameters, list_text_example_models, list_example_parameters, list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/NPSG_Y/", coord, position, list_nodes, list_graph, list_text_secondary_parameters, initial_secondary_parameters, "NPSG_Y", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
 
         self.width_input = 5
         self.width_matrix = 3
@@ -124,13 +123,15 @@ class SM(Base_model):
 
     def set_primary_parameters(self):
         if (self.secondary_parameters != ["Нет данных"] * len(self.list_text_secondary_parameters)):
-            self.wc = np.float64(get_wc(Xc = self.secondary_parameters[4], delta = self.secondary_parameters[11], S = self.secondary_parameters[9]*self.secondary_parameters[10]))
-            self.wr = np.float64(get_wr(wc = self.wc, delta = self.secondary_parameters[11], S = self.secondary_parameters[9]*self.secondary_parameters[10], Pn = self.secondary_parameters[1], cosfi= self.secondary_parameters[2], Un= self.secondary_parameters[0], Ifn = self.secondary_parameters[3]/self.secondary_parameters[6], Xc = self.secondary_parameters[4]))
+            k = self.secondary_parameters[0]**2*self.secondary_parameters[2]/self.secondary_parameters[1]
+            self.tau = np.float64(np.pi*self.secondary_parameters[9]/2)
+            self.wc = np.float64(get_wc(Xc = self.secondary_parameters[4]*k, delta = self.secondary_parameters[10], S = self.secondary_parameters[8]*self.tau))
+            self.wr = np.float64(get_wr(wc = self.wc, delta = self.secondary_parameters[10], S = self.secondary_parameters[8]*self.tau, Pn = self.secondary_parameters[1], cosfi= self.secondary_parameters[2], Un= self.secondary_parameters[0], Ifn = self.secondary_parameters[3], Xc = self.secondary_parameters[4]*k))
             self.Rs = np.float64(self.secondary_parameters[5])
             self.Rr = np.float64(self.secondary_parameters[6])
-            self.Ls = np.float64(self.secondary_parameters[7])
-            self.Lrs = np.float64(self.secondary_parameters[8])
-            self.delta = self.secondary_parameters[11]
-            self.tau = self.secondary_parameters[9]
-            self.l = self.secondary_parameters[10]
-            self.J = self.secondary_parameters[12]
+            self.Ls = np.float64(self.secondary_parameters[7]*k/100/np.pi)
+            self.Lrs = np.float64(0.00001)
+            self.delta = self.secondary_parameters[10]
+            self.l = self.secondary_parameters[8]
+            self.J = self.secondary_parameters[11]
+            print(self.wc, self.wr)
