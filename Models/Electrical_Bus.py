@@ -35,6 +35,8 @@ class Electrical_Bus:
         self.model_text = self.canv.create_text(self.x, self.y, text = str(self.number_of_connection), fill = "black", font = ("GOST Type A", "14"), anchor="sw")   
   
         self.list_indications = []
+        self.create_rect_indication_outline_selection = False #
+        self.replace_state = False
 
     def __del__(self):
         try:
@@ -129,6 +131,10 @@ class Electrical_Bus:
             self.canv.coords(self.model_text, m_x - self.delta_x, m_y - self.delta_y)
             self.x = m_x - self.delta_x           
             self.y = m_y - self.delta_y
+            if self.replace_state:
+                self.canv.coords(self.rect_indication_outline_selection, self.x, self.y, self.x + self.image_width, self.y + self.image_height)
+            else:
+                pass
 
     def indication_for_wire_on(self, WIDTH, HEIGTH):
         color = "blue"
@@ -165,3 +171,20 @@ class Electrical_Bus:
     def context_menu(self, m_x, m_y):
         if ((m_x >= self.x) and (m_x <= self.x + self.image_width) and (m_y >= self.y) and (m_y <= self.y + self.image_height)):
             return True
+
+    def node_in_area(self, x1, y1, x2, y2):
+        if (((self.x >= x1) and (self.y >= y1) and (self.x + self.image_width < x2) and (self.y + self.image_height < y2)) or
+            ((self.x >= x2) and (self.y >= y2) and (self.x + self.image_width < x1) and (self.y + self.image_height < y1)) or
+            ((self.x >= x1) and (self.y + self.image_height <= y1) and (self.x + self.image_width < x2) and (self.y > y2)) or
+            ((self.x >= x2) and (self.y + self.image_height <= y2) and (self.x + self.image_width < x1) and (self.y > y1))):
+            if (self.create_rect_indication_outline_selection == False):
+                self.create_rect_indication_outline_selection = True
+                self.rect_indication_outline_selection = self.canv.create_rectangle(self.x, self.y, self.x + self.image_width, self.y + self.image_height, width = 2, outline = "red")
+        else:
+            if (self.create_rect_indication_outline_selection == True):
+                self.create_rect_indication_outline_selection = False
+                self.canv.delete(self.rect_indication_outline_selection)
+
+    def delete_outline_node(self):
+        self.create_rect_indication_outline_selection = False
+        self.canv.delete(self.rect_indication_outline_selection)

@@ -27,20 +27,6 @@ list_nodes = ["Q:ON_SWITCH"]
 
 list_graph = [0, 1, 2, 3, 6]
 
-list_text_secondary_parameters = ["Номинальное напряжение, кВ:",
-    "Число пар полюсов, шт:",
-    "Главное индуктивное сопротивление обмотки статора, Ом:",
-    "Коэффициент трансформации:",
-    "Активное сопротивление обмотки статора, Ом:",
-    "Активное сопротивление обмотки ротора, Ом:",
-    "Индуктивное сопротивление рассеяния обмотки статора, Ом:",
-    "Индуктивное сопротивление рассеяния рассеяния обмотки ротора, Ом:",
-    "Длина машины, м:",
-    "Внутренний диаметр статора, м:",
-    "Длина воздушного зазора, м:",
-    "Момент инерции ротора, кг*м2:"]
-
-
 list_text_control_actions = {"Нагрузочный момент": ["s, %", "M(s), кН*м"], "Сопротивление реостата, доли Rr": ["s, %", "N(s), о.е."]}
 
 list_text_initial_conditions = ["Ток фазы 'А' статора, А",
@@ -56,7 +42,7 @@ class WRIM(Base_model):
 
     def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters):
 
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/WRIM/", coord, position, list_nodes, list_graph, list_text_secondary_parameters, initial_secondary_parameters, "WRIM", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/WRIM/", coord, position, list_nodes, list_graph, initial_secondary_parameters, "WRIM", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
 
         self.width_input = 8
         self.width_matrix = 6

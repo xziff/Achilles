@@ -32,41 +32,6 @@ list_nodes = ["Q:ON_SWITCH"]
 
 list_graph = [0, 2, 3]
 
-list_text_secondary_parameters = ["Номинальное напряжение, кВ:",
-    "Номинальная активная мощность, МВт:",
-    "Коэффициент мощности:",
-    "Номинальный ток возбуждения, В:",
-    "Сихнронное индуктиновное сопротивление, о.е.:",
-    "Активное сопротивление обмотки статора, Ом:",
-    "Активное сопротивление обмотки возбуждения, Ом:",
-    "Индуктивное сопротивление рассеяния обмотки статора, о.е.:",
-    "Длина машины, м:",
-    "Внутренний диаметр статора, м:",
-    "Длина воздушного зазора, м:",
-    "Момент инерции ротора, кг*м2:"
- ]
-
-list_text_example_models = [
-    "Пользовательский",
-    "ТВФ-63-2УЗ",
-    "ТВФ-110-2ЕУЗ",
-    "ТВФ-120-2УЗ",
-    "ТВВ-160-2ЕУЗ",
-    "ТГВ-200-2УЗ",
-    "ТВВ-320-2ЕУЗ",
-    "ТГВ-500-4УЗ",
-    "390H"]
-
-list_example_parameters = [[10.5, 63, 0.8, 139.61, 2.118, 0.002, 0.0953, 0.0001, 0.0002, 3.1, 1.075*math.pi/2, 0.0425, 2615],
-    [10.5, 110, 0.8,  219.24, 1.636, 0.00104, 0.126, 0.0001, 0.0002, 3.1, 1.128*math.pi/2, 0.064, 3750],
-    [10.5, 120, 0.8, 205.8, 1.402, 0.00104, 0.12, 0.0001, 0.0002, 3.1, 1.128*math.pi/2, 0.064, 3750],
-    [15.75, 160, 0.85, 274.72, 2.257, 0.0024, 0.136, 0.0001, 0.0002, 3.85, 1.17*math.pi/2, 0.085, 4375],
-    [15.75, 200, 0.85, 327.12, 1.99, 0.00115, 0.174, 0.0001, 0.0002, 4.3, 1.235*math.pi/2, 0.080, 6070],
-    [20, 320, 0.85, 332.05, 1.804, 0.001335, 0.1145, 0.0001, 0.0002, 6, 1.265*math.pi/2, 0.095, 7950],
-    [20, 500, 0.85, 299.154, 1.467, 0.0011, 0.0683, 0.0001, 0.0002, 6.3, 1.315*math.pi/2, 0.095, 10280],
-    [18, 400, 0.95, 439.9616, 1.62, 0.00084, 0.2644, 0.0001, 0.0002, 5.3, 1.29*math.pi/2, 0.0824, 8670]
-    ]
-
 list_text_control_actions = {"Механический момент": ["t, с", "M(t), кН*м"], "Напряжение возбуждения": ["t, с", "Uв(t), В"]}
 
 list_text_initial_conditions = ["Ток фазы 'А', А", 
@@ -78,7 +43,7 @@ list_text_initial_conditions = ["Ток фазы 'А', А",
 class NPSG_Y(Base_model):
 
     def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters):
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/NPSG_Y/", coord, position, list_nodes, list_graph, list_text_secondary_parameters, initial_secondary_parameters, "NPSG_Y", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/NPSG_Y/", coord, position, list_nodes, list_graph, initial_secondary_parameters, "NPSG_Y", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
 
         self.width_input = 5
         self.width_matrix = 3
@@ -134,4 +99,3 @@ class NPSG_Y(Base_model):
             self.delta = self.secondary_parameters[10]
             self.l = self.secondary_parameters[8]
             self.J = self.secondary_parameters[11]
-            print(self.wc, self.wr)

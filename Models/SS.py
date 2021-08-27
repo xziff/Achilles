@@ -18,16 +18,6 @@ list_nodes = ["Q1:ON_SWITCH", "Q2:ON_SWITCH"]
 
 list_graph = [0, 1]
 
-list_text_secondary_parameters = ["Фиктивная индуктивность, Гн:",
-"Активное сопротивление, Ом:",
-"Время отключения, с"]
-
-list_text_example_models = [
-    "Пользовательский",
-    "Тест"]
-
-list_example_parameters = [[0.00001, 0.002, 0.02]]
-
 list_text_control_actions = {"Позиции выключателя": ["Время, с", "Позиция"]}
 
 list_text_initial_conditions = ["Ток фазы 'А' статора, А",
@@ -37,7 +27,7 @@ class SS(Base_model):
 
     def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters):
 
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/SS/", coord, position, list_nodes, list_graph, list_text_secondary_parameters, initial_secondary_parameters, "SS", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/SS/", coord, position, list_nodes, list_graph, initial_secondary_parameters, "SS", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
 
         self.width_input = 2
         self.width_matrix = 2

@@ -20,6 +20,7 @@ def create_image_for_model(pass_obj, k_size):
 
 class Wire:
     def __init__(self, canv, x0, y0, text_tag, initial_coords):
+        self.bool_wire_in_area = False
         self.text_tag = text_tag
         self.canv = canv
         if (initial_coords == None):
@@ -30,8 +31,9 @@ class Wire:
             self.activity = True
             self.coords_wire = initial_coords
             self.canvas_object_wire = []
-        size_con = 4
-        self.quad_con = self.canv.create_rectangle(self.coords_wire[0][0] - size_con, self.coords_wire[0][1] - size_con, self.coords_wire[0][0] + size_con, self.coords_wire[0][1] + size_con, width = 2, fill = "black")
+        self.size_con = 4
+        self.delta_for_points_wire = []
+        self.quad_con = self.canv.create_rectangle(self.coords_wire[0][0] - self.size_con, self.coords_wire[0][1] - self.size_con, self.coords_wire[0][0] + self.size_con, self.coords_wire[0][1] + self.size_con, width = 2, fill = "black")
 
     def move_end_wire(self, m_x, m_y, list_nodes, WIDTH, HEIGHT):
         if self.activity:
@@ -122,6 +124,41 @@ class Wire:
         else:
             return False
 
+    def wire_in_area(self, x1, y1, x2, y2):
+        help_bool_wire_in_area = True
+        for i in self.coords_wire:
+            if (((i[0] >= x1) and (i[1] >= y1) and (i[0] < x2) and (i[1] < y2)) or
+                ((i[0] >= x2) and (i[1] >= y2) and (i[0] < x1) and (i[1] < y1)) or
+                ((i[0] >= x1) and (i[1] <= y1) and (i[0] < x2) and (i[1] > y2)) or
+                ((i[0] >= x2) and (i[1] <= y2) and (i[0] < x1) and (i[1] > y1))):
+                pass
+            else:
+                help_bool_wire_in_area = False
+        
+        if not self.bool_wire_in_area and help_bool_wire_in_area:
+            self.canvas_object_wire_indication_outline = []
+            for i in range(len(self.coords_wire) - 1):
+                w_x, w_y = self.coords_wire[i]
+                w_x_new, w_y_new = self.coords_wire[i + 1]
+                self.canvas_object_wire_indication_outline.append(self.canv.create_line(w_x, w_y, w_x_new, w_y_new, width = 2, fill = "red"))
+            self.bool_wire_in_area = True
+        if not help_bool_wire_in_area and self.bool_wire_in_area:
+            self.bool_wire_in_area = False
+            for i in self.canvas_object_wire_indication_outline:
+                    self.canv.delete(i)
+            self.canvas_object_wire_indication_outline = []
+
+    def move_wire(self, m_x, m_y):
+        for i in range(len(self.coords_wire)):
+            self.coords_wire[i][0] = m_x - self.delta_for_points_wire[i][0]
+            self.coords_wire[i][1] = m_y - self.delta_for_points_wire[i][1]
+        for i in range(len(self.coords_wire) - 1):
+            w_x, w_y = self.coords_wire[i]
+            w_x_new, w_y_new = self.coords_wire[i + 1]
+            self.canv.coords(self.canvas_object_wire[i], w_x, w_y, w_x_new, w_y_new)
+            self.canv.coords(self.canvas_object_wire_indication_outline[i], w_x, w_y, w_x_new, w_y_new)
+        self.canv.coords(self.quad_con, self.coords_wire[0][0] - self.size_con, self.coords_wire[0][1] - self.size_con, self.coords_wire[0][0] + self.size_con, self.coords_wire[0][1] + self.size_con)
+
     def delete_wire(self):
         for i in self.canvas_object_wire:
             self.canv.delete(i)
@@ -131,7 +168,7 @@ class Wire:
 class Base_model:
 
     def __init__(self, init_x, init_y, canv, root, path_to_image_model, dxdy, position, list_nodes, 
-    list_graph, list_text_secondary_parameters, initial_secondary_parameters, name_model,
+    list_graph, initial_secondary_parameters, name_model,
     list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires):
 
         self.mu0 = np.float64(4*np.pi*10**(-7))
@@ -145,8 +182,8 @@ class Base_model:
             for key, item in data.items():
                 self.list_text_example_models.append(key)
                 self.list_example_parameters.append(item)
+            self.list_text_secondary_parameters = pickle.load(f)
 
-        self.list_text_secondary_parameters = list_text_secondary_parameters
         if (initial_initial_conditions == None):
             self.list_initial_conditions = [0] * len(self.list_text_initial_conditions)
         else:
@@ -200,6 +237,8 @@ class Base_model:
         self.state_click = 0 #
         self.k_click = 0.0 #
         self.quad_indication_create = False #
+        self.replace_state = False
+        self.create_rect_indication_outline_selection = False #
         self.data_type = np.float64
 
     def get_first(self):
@@ -232,7 +271,17 @@ class Base_model:
             self.x = m_x - self.delta_x
             self.y = m_y - self.delta_y
             self.canv.coords(self.click_indication, self.x, self.y, self.x + self.image_width, self.y + self.image_height) 
-            self.delete_all_wires()
+            if self.replace_state:
+                self.canv.coords(self.rect_indication_outline_selection, self.x, self.y, self.x + self.image_width, self.y + self.image_height)
+                for i in range(len(self.list_wires)):
+                    if (self.list_wires[i] != "not exist"):
+                        if self.list_wires[i].bool_wire_in_area:
+                            self.list_wires[i].move_wire(m_x, m_y)
+                        else:
+                            self.list_wires[i].delete_wire()
+                            self.list_wires[i] = "not exist"
+            else:
+                self.delete_all_wires()
     
     def indication_wire_connection(self, m_x, m_y):
         size_area_indication = 10
@@ -315,6 +364,10 @@ class Base_model:
 
     def context_menu(self, m_x, m_y):
         if ((m_x >= self.x + self.k_click*self.image_width) and (m_x <= self.x + self.image_width - self.k_click*self.image_width) and (m_y >= self.y + self.k_click*self.image_height) and (m_y <= self.y + self.image_height - self.k_click*self.image_height) and (self.bool_mouse_in_area == False)):
+            return True
+
+    def mouse_in_model(self, m_x, m_y):
+        if ((m_x >= self.x + self.k_click*self.image_width) and (m_x <= self.x + self.image_width - self.k_click*self.image_width) and (m_y >= self.y + self.k_click*self.image_height) and (m_y <= self.y + self.image_height - self.k_click*self.image_height)):
             return True
 
     def set_secondary_parameters(self):
@@ -474,3 +527,20 @@ class Base_model:
     def delete_model(self):
         self.canv.delete(self.image_model)
         self.delete_all_wires()
+
+    def model_in_area(self, x1, y1, x2, y2):
+        if (((self.x >= x1) and (self.y >= y1) and (self.x + self.image_width < x2) and (self.y + self.image_height < y2)) or
+            ((self.x >= x2) and (self.y >= y2) and (self.x + self.image_width < x1) and (self.y + self.image_height < y1)) or
+            ((self.x >= x1) and (self.y + self.image_height <= y1) and (self.x + self.image_width < x2) and (self.y > y2)) or
+            ((self.x >= x2) and (self.y + self.image_height <= y2) and (self.x + self.image_width < x1) and (self.y > y1))):
+            if (self.create_rect_indication_outline_selection == False):
+                self.create_rect_indication_outline_selection = True
+                self.rect_indication_outline_selection = self.canv.create_rectangle(self.x, self.y, self.x + self.image_width, self.y + self.image_height, width = 2, outline = "red")
+        else:
+            if (self.create_rect_indication_outline_selection == True):
+                self.create_rect_indication_outline_selection = False
+                self.canv.delete(self.rect_indication_outline_selection)
+
+    def delete_outline_model(self):
+        self.create_rect_indication_outline_selection = False
+        self.canv.delete(self.rect_indication_outline_selection)

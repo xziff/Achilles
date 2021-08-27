@@ -55,12 +55,34 @@ def update_dictionary():
     for key, item in current_update_list.items():
         req = test(key, item)
         cursor.execute(req)
-        item = cursor.fetchall()
+        item_i = cursor.fetchall()
         d_item = {}
-        for i in item:
+        for i in item_i:
             d_item[i[0]] = np.array(i[1:]).astype(np.float64)
+        
+        req = 'SELECT "oid" FROM "pg_class" WHERE "relname" = ' + "'" + key + "'"
+        cursor.execute(req)
+        objoid = str(cursor.fetchall()[0][0])
+        
+        req = 'SELECT "description" FROM "pg_description" WHERE "objoid" = ' + "'" + objoid + "'"
+        cursor.execute(req)
+        description = cursor.fetchall()[2:]
+
+        req = 'SELECT "description" FROM "pg_description" WHERE "objoid" = ' + "'" + objoid + "'"
+        req = 'SELECT column_name FROM information_schema.columns WHERE table_name = ' + "'" + key + "'"
+        cursor.execute(req)
+        list_columns = cursor.fetchall()[1:]
+
+        list_d = []
+
+        for i in item:
+            for j in range(len(list_columns)):
+                if (i == list_columns[j][0]):
+                    list_d.append(description[j][0])
+
         with open('Dictionary/' + key + '.pickle', 'wb') as f:
             pickle.dump(d_item, f)
+            pickle.dump(list_d, f)
 
     cursor.close()
     conn.close()
