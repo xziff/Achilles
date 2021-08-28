@@ -28,9 +28,15 @@ class Wire:
             self.coords_wire = [[x0, y0], [x0, y0]]
             self.canvas_object_wire = [canv.create_line(x0, y0, x0, y0, dash = (5, 5), width = 1, fill = "red")]
         else:
-            self.activity = True
-            self.coords_wire = initial_coords
+            self.activity = False
+            self.coords_wire = []
+            for i in initial_coords:
+                self.coords_wire.append(i.copy())
             self.canvas_object_wire = []
+            for i in range(len(self.coords_wire) - 1):
+                w_x, w_y = self.coords_wire[i]
+                w_x_new, w_y_new = self.coords_wire[i + 1]
+                self.canvas_object_wire.append(self.canv.create_line(w_x, w_y, w_x_new, w_y_new, width = 3.5))
         self.size_con = 4
         self.delta_for_points_wire = []
         self.quad_con = self.canv.create_rectangle(self.coords_wire[0][0] - self.size_con, self.coords_wire[0][1] - self.size_con, self.coords_wire[0][0] + self.size_con, self.coords_wire[0][1] + self.size_con, width = 2, fill = "black")
@@ -187,18 +193,18 @@ class Base_model:
         if (initial_initial_conditions == None):
             self.list_initial_conditions = [0] * len(self.list_text_initial_conditions)
         else:
-            self.list_initial_conditions = initial_initial_conditions
+            self.list_initial_conditions = initial_initial_conditions.copy()
         if (initial_control_actions == None):
             self.list_params = []
             for i in range(len(list_text_control_actions)):                
                 self.list_params.append([[], []])
         else:
-            self.list_params = initial_control_actions
+            self.list_params = initial_control_actions.copy()
             self.corrent_list_params()
         if (initial_secondary_parameters == None):
             self.secondary_parameters = ["Нет данных"] * len(self.list_text_secondary_parameters)
         else:
-            self.secondary_parameters = initial_secondary_parameters
+            self.secondary_parameters = initial_secondary_parameters.copy()
             self.set_primary_parameters()
         self.list_graph = list_graph
         self.list_nodes = list_nodes
@@ -270,7 +276,6 @@ class Base_model:
             self.canv.coords(self.image_model, m_x - self.delta_x, m_y - self.delta_y)
             self.x = m_x - self.delta_x
             self.y = m_y - self.delta_y
-            self.canv.coords(self.click_indication, self.x, self.y, self.x + self.image_width, self.y + self.image_height) 
             if self.replace_state:
                 self.canv.coords(self.rect_indication_outline_selection, self.x, self.y, self.x + self.image_width, self.y + self.image_height)
                 for i in range(len(self.list_wires)):
@@ -281,6 +286,7 @@ class Base_model:
                             self.list_wires[i].delete_wire()
                             self.list_wires[i] = "not exist"
             else:
+                self.canv.coords(self.click_indication, self.x, self.y, self.x + self.image_width, self.y + self.image_height) 
                 self.delete_all_wires()
     
     def indication_wire_connection(self, m_x, m_y):

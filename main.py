@@ -173,6 +173,7 @@ def click_1(event):
             selection_outline = canv.create_rectangle(event.x, event.y, event.x, event.y, outline="red", width=2)
     if scheme_replace:
         scheme_replace = False
+        
         for i in list_models:
             for j in i:
                 if j.create_rect_indication_outline_selection:
@@ -180,16 +181,17 @@ def click_1(event):
                         if (k != "not exist"):
                             k.bool_wire_in_area = False
                             for m in k.canvas_object_wire_indication_outline:
-                                    canv.delete(m)
+                                canv.delete(m)
                     j.replace_state = False
                     j.state_click = 0
                     j.create_rect_indication_outline_selection = False
                     canv.delete(j.rect_indication_outline_selection)
         for i in list_nodes:
-            i.replace_state = False
-            i.state_click = 0
-            i.create_rect_indication_outline_selection = False
-            canv.delete(i.rect_indication_outline_selection)
+            if i.create_rect_indication_outline_selection:
+                i.replace_state = False
+                i.state_click = 0
+                i.create_rect_indication_outline_selection = False
+                canv.delete(i.rect_indication_outline_selection)
 
         for i in list_nodes:
             i.control_connection(list_models)
@@ -346,28 +348,64 @@ def replace():
 
 
 def paste(event):
+
+    def help_m(model):
+        model.create_rect_indication_outline_selection = True
+        for k in model.list_wires:
+            if (k != "not exist"):
+                k.bool_wire_in_area = True
+                k.canvas_object_wire_indication_outline = []
+                for j in range(len(k.coords_wire) - 1):
+                    w_x, w_y = k.coords_wire[j]
+                    w_x_new, w_y_new = k.coords_wire[j + 1]
+                    k.canvas_object_wire_indication_outline.append(canv.create_line(w_x, w_y, w_x_new, w_y_new, width = 2, fill = "red"))
+        model.rect_indication_outline_selection = canv.create_rectangle(model.x, model.y, model.x + model.image_width, model.y + model.image_height, width = 2, outline = "red")
+
     global copy_list_model, copy_list_node
-
-    #Определение геометрического центра вставки
-
+    for i in list_models:
+        for j in i:
+            for k in j.list_wires:
+                if (k != "not exist"):
+                    k.bool_wire_in_area = False
+                    try:
+                        for i in k.canvas_object_wire_indication_outline:
+                            canv.delete(i)
+                    except AttributeError:
+                        pass
+            j.create_rect_indication_outline_selection = False
+            try:
+                canv.delete(j.rect_indication_outline_selection)
+            except AttributeError:
+                pass
+    for i in list_nodes:
+        i.create_rect_indication_outline_selection = False
+        try:
+            canv.delete(i.rect_indication_outline_selection)
+        except AttributeError:
+            pass
 
     for i in copy_list_model[0]:
         list_models[0].append(DWT_YD_11(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
+        help_m(list_models[0][-1])
     for i in copy_list_model[1]:
         list_models[1].append(NPSG_Y(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
+        help_m(list_models[1][-1])
     for i in copy_list_model[2]:
         list_models[2].append(WRIM(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
+        help_m(list_models[2][-1])
     for i in copy_list_model[3]:
         list_models[3].append(ES(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
+        help_m(list_models[3][-1])
     for i in copy_list_model[4]:
         list_models[4].append(SS(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
+        help_m(list_models[4][-1])
 
     for i in copy_list_node:
         list_nodes.append(Electrical_Bus(i[0], i[1], i[2], canv, root))
+        list_nodes[-1].create_rect_indication_outline_selection = True
+        list_nodes[-1].rect_indication_outline_selection = canv.create_rectangle(list_nodes[-1].x, list_nodes[-1].y, list_nodes[-1].x + list_nodes[-1].image_width, list_nodes[-1].y + list_nodes[-1].image_height, width = 2, outline = "red")
 
-    for i in list_nodes:
-        i.control_connection(list_models)
-
+    replace()
 
 def copy():
     global copy_list_model
@@ -380,17 +418,23 @@ def copy():
                 for k in j.list_wires:
                     if (k != "not exist"):
                         if (k.bool_wire_in_area == True):
-                            initial_list_wires.append(k.coords_wire)
+                            initial_list_wires.append([])
+                            for n in k.coords_wire:
+                                initial_list_wires[-1].append([])
+                                initial_list_wires[-1][-1].append(n[0] + WIDTH)
+                                initial_list_wires[-1][-1].append(n[1] + HEIGHT)           
                         else:
                             initial_list_wires.append("not exist")
                     else:
                         initial_list_wires.append("not exist")      
-                copy_list_model[-1].append([j.x, j.y, j.position, initial_list_wires, j.list_params, j.list_initial_conditions, j.secondary_parameters])
-    
+                copy_list_model[-1].append([j.x + WIDTH, j.y + HEIGHT, j.position, initial_list_wires, j.list_params, j.list_initial_conditions, j.secondary_parameters])
+
+
     global copy_list_node
     copy_list_node = []
     for i in list_nodes:
-        copy_list_node.append([i.x, i.y, i.position])
+        if i.create_rect_indication_outline_selection:
+            copy_list_node.append([i.x + WIDTH, i.y + HEIGHT, i.position])
 
 
 # Создание главного окна

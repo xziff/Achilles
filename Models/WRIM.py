@@ -115,7 +115,9 @@ class WRIM(Base_model):
 
             self.wc = np.sqrt(self.secondary_parameters[2]*self.delta*np.pi/(4*1*3*50*self.mu0*self.tau*self.l*self.p))
             self.wr = self.wc / self.secondary_parameters[3]
-    
+
+            self.J = np.float64(self.secondary_parameters[11])
+            print(self.J)
     def set_control_actions_help(self):
         s = np.linspace(-0.5, 1, 1000)
         M = []
