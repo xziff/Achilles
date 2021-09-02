@@ -38,7 +38,7 @@ class SS(Base_model):
         self.Loff = 0
         #self.R = 0.0002
         self.Roff = 0
-        #self.dt = 0.02
+        self.dt = 0.2
 
         #self.inital_position_switch = True # T - замкнут, F разомкнут
         #self.position_switch = self.inital_position_switch

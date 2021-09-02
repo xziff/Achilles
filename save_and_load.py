@@ -6,6 +6,7 @@ from Models.NPSG_Y import NPSG_Y
 from Models.WRIM import WRIM
 from Models.ES import ES
 from Models.SS import SS
+from Models.SL_Y import SL_Y
 
 def save_models_nodes(path_str, list_models, list_nodes):
     with open('saves_schemes/' + path_str + '.pickle', 'wb') as f:
@@ -44,6 +45,8 @@ def load_models_nodes(path_str, list_models, list_nodes, canv, root):
             list_models[3].append(ES(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
         for i in data[4]:
             list_models[4].append(SS(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
+        for i in data[5]:
+            list_models[5].append(SL_Y(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
 
         data = pickle.load(f)
         for i in data:
