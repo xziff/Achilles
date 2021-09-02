@@ -142,8 +142,8 @@ class SS(Base_model):
 
     def set_primary_parameters(self):
         if (self.secondary_parameters != ["Нет данных"] * len(self.list_text_secondary_parameters)):
-            self.L = np.float64(self.secondary_parameters[0])
-            self.R = np.float64(self.secondary_parameters[1])
+            self.L = np.float64(self.secondary_parameters[1])
+            self.R = np.float64(self.secondary_parameters[0])
             self.dt = np.float64(self.secondary_parameters[2])
 
 

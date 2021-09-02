@@ -185,9 +185,8 @@ def return_graphs(main_list, list_models, results, t):
         
 
 
-def calculations(list_nodes, list_models):
-    t_max = 8
-    t_del = 1000000
+def calculations(list_nodes, list_models, t_max, t_del):
+    print(t_max, t_del)
     t = np.linspace(0, t_max, t_del)
 
     main_list = get_main_list(list_nodes, list_models)
@@ -205,7 +204,7 @@ def calculations(list_nodes, list_models):
     flag_time_interrupt = [False] * len(time_interrupt)
 
     def f(y, t):
-        global all_voltage_matrix, all_current_matrix
+        #global all_voltage_matrix, all_current_matrix
         wait_index = 0
         current_index = [0, 0]
         ouput_matrix = []
@@ -216,20 +215,20 @@ def calculations(list_nodes, list_models):
             i.check_switch(t)
 
         ###
-        for i in range(len(time_interrupt)):
-            if (t >= time_interrupt[i]):
-                current_interrupt_time_index = i
-            else:
-                break
-        if not flag_time_interrupt[current_interrupt_time_index]:
-            for i in range(len(time_interrupt)):
-                flag_time_interrupt[i] = False
-            flag_time_interrupt[current_interrupt_time_index] = True
+        #for i in range(len(time_interrupt)):
+        #    if (t >= time_interrupt[i]):
+        #        current_interrupt_time_index = i
+        #    else:
+        #        break
+        #if not flag_time_interrupt[current_interrupt_time_index]:
+        #    for i in range(len(time_interrupt)):
+        #        flag_time_interrupt[i] = False
+        #    flag_time_interrupt[current_interrupt_time_index] = True
 
-            for i in list_nodes:
-                i.control_connection(list_models)
+        #    for i in list_nodes:
+        #        i.control_connection(list_models)
 
-            all_voltage_matrix, all_current_matrix = communacation_matrix(list_nodes, list_models, main_list)
+        #    all_voltage_matrix, all_current_matrix = communacation_matrix(list_nodes, list_models, main_list)
         ###
 
         for type_model, number_moder in main_list:

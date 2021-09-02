@@ -88,7 +88,7 @@ class NPSG_Y(Base_model):
 
     def set_primary_parameters(self):
         if (self.secondary_parameters != ["Нет данных"] * len(self.list_text_secondary_parameters)):
-            k = self.secondary_parameters[0]**2*self.secondary_parameters[2]/self.secondary_parameters[1]
+            k = (self.secondary_parameters[0]**2)*self.secondary_parameters[2]/self.secondary_parameters[1]
             self.tau = np.float64(np.pi*self.secondary_parameters[9]/2)
             self.wc = np.float64(get_wc(Xc = self.secondary_parameters[4]*k, delta = self.secondary_parameters[10], S = self.secondary_parameters[8]*self.tau))
             self.wr = np.float64(get_wr(wc = self.wc, delta = self.secondary_parameters[10], S = self.secondary_parameters[8]*self.tau, Pn = self.secondary_parameters[1], cosfi= self.secondary_parameters[2], Un= self.secondary_parameters[0], Ifn = self.secondary_parameters[3], Xc = self.secondary_parameters[4]*k))
@@ -99,3 +99,20 @@ class NPSG_Y(Base_model):
             self.delta = self.secondary_parameters[10]
             self.l = self.secondary_parameters[8]
             self.J = self.secondary_parameters[11]
+
+            self.tau = 1.689
+            self.wc = 8.465
+            self.wr = 79.258
+            self.Rs = 0.002
+            self.Rr = 0.095
+            self.Ls = 0.00001
+            self.Lrs = 0.00002
+            self.delta = 0.043
+            self.l = 3.1
+            self.J = 2615
+
+            self.Urxx = 10.5/np.sqrt(3)*1000*self.Rr*math.pi*self.delta*math.pi/(100*math.pi*math.sqrt(2)*self.wc*self.wr*self.mu0*2*self.tau*self.l)
+            self.Mnom = self.secondary_parameters[1]/(100*np.pi)
+            print(self.Urxx)
+
+    #def set_control_actions_help(self):

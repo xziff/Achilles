@@ -7,6 +7,7 @@ from Models.NPSG_Y import NPSG_Y
 from Models.WRIM import WRIM
 from Models.ES import ES
 from Models.SS import SS
+from Models.SL_Y import SL_Y
 
 def add_model(mass_model, list_nodes, return_text, WIDTH, HEIGHT, canv, root):
     if (return_text == "Обычный узел"):
@@ -30,6 +31,9 @@ def add_model(mass_model, list_nodes, return_text, WIDTH, HEIGHT, canv, root):
         elif (return_text == "Вылючатель"):
             m_i = 4
             mass_model[4].append(SS(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
+        elif (return_text == "Статическаая нагрузка"):
+            m_i = 5
+            mass_model[5].append(SL_Y(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
         else:
             print("Error")
         mass_model[m_i][-1].state_click = 1
@@ -72,6 +76,8 @@ def get_tree_window(root):
     tree.move(8, 7, 0)
     tree.insert('', END, text='Вылючатель', iid=9, open=False)
     tree.move(9, 7, 0)
+    tree.insert('', END, text='Статическаая нагрузка', iid=10, open=False)
+    tree.move(10, 7, 0)
 
     tree.grid(row=0, column=0, sticky='nsew')
 

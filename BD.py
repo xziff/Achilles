@@ -2,9 +2,6 @@ import psycopg2
 import pickle
 import numpy as np
 
-
-
-#list_tables = {"WRIM": ["Uном", "p", "xm", "Кт", "r1", "r2", "x1", "x2", "Lст.", "Dст.внутр.", "d", "Jрот."]}
 def update_dictionary():
     def test(name, list_col):
         req = 'SELECT'

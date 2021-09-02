@@ -9,6 +9,7 @@ from Models.NPSG_Y import NPSG_Y
 from Models.WRIM import WRIM
 from Models.ES import ES
 from Models.SS import SS
+from Models.SL_Y import SL_Y
 
 from tree_window import get_tree_window, add_model
 from calc import calculations
@@ -16,6 +17,8 @@ from save_and_load import save_models_nodes, load_models_nodes
 
 selection_outline_active = False
 scheme_replace = False
+max_t = 0
+max_point = 0
 
 #Массив узлов
 list_nodes = []
@@ -27,6 +30,7 @@ list_models.append([]) #Синхронная машина
 list_models.append([]) #Асинхронная машина
 list_models.append([]) #Система
 list_models.append([]) #Выключатель
+list_models.append([]) #Статическая нагрузка
 
 #Команды кнопок на экране
 def b1_command():
@@ -38,7 +42,7 @@ def b1_command():
     tree.bind("<Double-1>", OnDoubleClick)
 
 def start():
-    calculations(list_nodes, list_models)
+    calculations(list_nodes, list_models, max_t, max_point)
 
 def save_scheme():
     def bc():
@@ -74,7 +78,8 @@ def load_scheme():
         list_models.append([]) #Асинхронная машина
         list_models.append([]) #Система
         list_models.append([]) #Выключатель
-        
+        list_models.append([]) #Статическая нагрузка
+
         load_models_nodes(list_files.get(), list_models, list_nodes, canv, root)
         load_window.destroy()
 
@@ -250,7 +255,30 @@ def view(event):
                 j.view_results()
 
 def get_menu(event):
+    Press_model = False
+    for i in list_models:
+        for j in i:
+            for k in j.list_wires:
+                if (k != "not exist"):
+                    if (k.activity != False):
+                        Press_model = True
 
+    for i in list_nodes:
+        if (i.context_menu(event.x, event.y) == True):
+            Press_model = True
+    for i in list_models:
+        for j in i:
+            if ((j.mouse_in_model(event.x, event.y) == True)) or (j.bool_mouse_in_area == True):
+                Press_model = True
+    if not Press_model:
+        menu = Menu(tearoff=0, font = ('GOST Type A', 14))
+        menu.add_command(label="Дерево моделей",
+        command = b1_command)
+        menu.add_separator() 
+        menu.add_command(label="Вставить",
+        command = paste)
+        menu.post(event.x, event.y)
+        
     # Меню модели
     delete_index = []
     def delete_models():
@@ -347,7 +375,7 @@ def replace():
         i.delta_y = cent_y - i.y    
 
 
-def paste(event):
+def paste():
 
     def help_m(model):
         model.create_rect_indication_outline_selection = True
@@ -399,6 +427,9 @@ def paste(event):
     for i in copy_list_model[4]:
         list_models[4].append(SS(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
         help_m(list_models[4][-1])
+    for i in copy_list_model[5]:
+        list_models[5].append(SL_Y(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
+        help_m(list_models[5][-1])
 
     for i in copy_list_node:
         list_nodes.append(Electrical_Bus(i[0], i[1], i[2], canv, root))
@@ -436,6 +467,33 @@ def copy():
         if i.create_rect_indication_outline_selection:
             copy_list_node.append([i.x + WIDTH, i.y + HEIGHT, i.position])
 
+def set_params_calc():
+    global max_t, max_point
+
+    def on_closing():
+        global max_t, max_point
+        max_t = int(s1.get())
+        max_point = 1000*int(s2.get())
+        params_calc.destroy()
+
+    params_calc = Toplevel(root, bg = "white")
+    params_calc.title("Параметры расчета")
+    params_calc.protocol("WM_DELETE_WINDOW", on_closing)
+
+    l1 = Label(master= params_calc, text="Время расчета (сек):", font=('GOST Type A', 16), bg= "white")
+    l1.pack()
+    s1 = StringVar(value = max_t)
+    e1 = Entry(params_calc, width=15, font=('GOST Type A', 14), relief = SOLID, justify = CENTER,  borderwidth = 1, textvariable = s1)
+    e1.pack()
+
+    l2 = Label(master= params_calc, text="Количество точек (тыс. шт.):", font=('GOST Type A', 16), bg= "white")
+    l2.pack()
+    s2 = StringVar(value = max_point)
+    e2 = Entry(params_calc, width=15, font=('GOST Type A', 14), relief = SOLID,  borderwidth = 1, justify = CENTER, textvariable = s2)
+    e2.pack()
+
+
+
 
 # Создание главного окна
 root = Tk()
@@ -458,33 +516,25 @@ canv = Canvas(frame, width = WIDTH, height = HEIGHT, bg = "white", cursor = "pen
 
 for i in range(150):
     AQ = 35
-    canv.create_line(i*AQ, HEIGHT_MENU, i*AQ, HEIGHT, fill = "#dbdbdb")
+    canv.create_line(i*AQ, 0, i*AQ, HEIGHT, fill = "#dbdbdb")
     canv.create_line(0, i*AQ, WIDTH, i*AQ, fill = "#dbdbdb")
 
-#Создание рамки главного меню
-frame_menu=Frame(master = frame,  bg = "white", highlightbackground="black", highlightthickness=1, width=WIDTH, height=HEIGHT_MENU)
-frame_menu.pack_propagate(0)
-frame_menu.grid(row = 0, column = 0)
+#Меню
+mainmenu = Menu(root) 
+root.config(menu=mainmenu) 
 
-#Кнопка вызова дерева моделей
-b1 = Button(master = frame_menu, text="Дерево моделей", command= b1_command, height=HEIGHT_MENU, bg = "white", font = font.Font(family = "GOST Type A"))
-b1.pack(side = LEFT, padx = 10, pady = 10)
+    #Загрузка/сохранение файлов
+filemenu = Menu(mainmenu, tearoff=0)
+filemenu.add_command(label="Открыть...", command=load_scheme)
+filemenu.add_command(label="Сохранить...", command=save_scheme)
+mainmenu.add_cascade(label="Схема", menu=filemenu)
 
-#Кнопка для расчета
-b2 = Button(master = frame_menu, text="Начать расчет", command= start, height=HEIGHT_MENU, bg = "white", font = font.Font(family = "GOST Type A"))
-b2.pack(side = LEFT, padx = 10, pady = 10)
-
-#Кнопка для сохранения схемы
-b3 = Button(master = frame_menu, text="Сохранить схему", command= save_scheme, height=HEIGHT_MENU, bg = "white", font = font.Font(family = "GOST Type A"))
-b3.pack(side = RIGHT, padx = 10, pady = 10)
-
-#Кнопка для загрузки схемы
-b4 = Button(master = frame_menu, text="Загрузить схему", command= load_scheme, height=HEIGHT_MENU, bg = "white", font = font.Font(family = "GOST Type A"))
-b4.pack(side = RIGHT, padx = 10, pady = 10)
-
-#Кнопка для загрузки схемы
-frame_help_menu = Frame(master = frame_menu,  bg = "white", highlightbackground="black", highlightthickness=1)
-frame_help_menu.pack(side = LEFT, padx = 10, pady = 10)
+    #Начало расчета
+calcmenu = Menu(mainmenu, tearoff=0)
+calcmenu.add_command(label="Начать расчет", command=start)
+calcmenu.add_separator()
+calcmenu.add_command(label="Параметры расчета", command=set_params_calc)
+mainmenu.add_cascade(label="Расчет схемы", menu=calcmenu)
 
 #Бинды кнопок
 canv.bind('<Button-1>', click_1)
