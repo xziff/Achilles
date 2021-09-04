@@ -3,6 +3,9 @@ from tkinter import ttk
 import os
 import tkinter.font as font
 
+from BD import update_dictionary
+update_dictionary()
+
 from Models.Electrical_Bus import Electrical_Bus
 from Models.DWT_YD_11 import DWT_YD_11
 from Models.NPSG_Y import NPSG_Y

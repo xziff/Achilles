@@ -38,7 +38,7 @@ class SS(Base_model):
         self.Loff = 0
         #self.R = 0.0002
         self.Roff = 0
-        self.dt = 0.2
+        #self.dt = 0.2
 
         #self.inital_position_switch = True # T - замкнут, F разомкнут
         #self.position_switch = self.inital_position_switch
@@ -101,7 +101,7 @@ class SS(Base_model):
         if not self.start_position:
             if (self.position_switch == False):
                 if (t - self.switch_time[self.index_current_switch_time] < self.dt):
-                    self.Roff = 1000000/self.dt*(t - self.switch_time[self.index_current_switch_time]) 
+                    self.Roff = 100000/self.dt*(t - self.switch_time[self.index_current_switch_time]) 
                 else:
                     self.Roff = 0
                 self.Loff = 0

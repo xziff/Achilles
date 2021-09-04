@@ -83,5 +83,3 @@ def update_dictionary():
 
     cursor.close()
     conn.close()
-
-update_dictionary()
