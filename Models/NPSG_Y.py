@@ -1,6 +1,7 @@
 import math
 from tkinter import *
 from tkinter import ttk
+import tkinter.messagebox as mb
 from PIL import ImageTk, Image
 import matplotlib.pyplot as plt
 from scipy. integrate import odeint
@@ -111,8 +112,8 @@ class NPSG_Y(Base_model):
             self.l = 3.1
             self.J = 2615
 
-            self.Urxx = 10.5/np.sqrt(3)*1000*self.Rr*math.pi*self.delta*math.pi/(100*math.pi*math.sqrt(2)*self.wc*self.wr*self.mu0*2*self.tau*self.l)
+            self.Urxx = self.secondary_parameters[0]/np.sqrt(3)*1000*self.Rr*math.pi*self.delta*math.pi/(100*math.pi*math.sqrt(2)*self.wc*self.wr*self.mu0*2*self.tau*self.l)
             self.Mnom = self.secondary_parameters[1]/(100*np.pi)
-            print(self.Urxx)
 
-    #def set_control_actions_help(self):
+    def set_control_actions_help(self):
+        mb.showinfo("Информация", "Напряжение возбуждения холостого хода = " + str(self.Urxx))
