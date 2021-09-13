@@ -41,10 +41,17 @@ list_text_initial_conditions = ["Ток фазы 'А', А",
                                     "Частота вращения ротора, рад/с",
                                     "Угол поворота ротора, рад", ]
 
+coords_text = [
+    [304, -40, "s"],
+    [400, 338, 'w'],
+    [304, -40, "s"],
+    [400, 338, 'w']
+]
+
 class NPSG_Y(Base_model):
 
-    def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters):
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/NPSG_Y/", coord, position, list_nodes, list_graph, initial_secondary_parameters, "NPSG_Y", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
+    def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters, Comdobox_index):
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/NPSG_Y/", coord, position, list_nodes, list_graph, initial_secondary_parameters, "NPSG_Y", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires, coords_text, Comdobox_index)
 
         self.width_input = 5
         self.width_matrix = 3
@@ -100,17 +107,6 @@ class NPSG_Y(Base_model):
             self.delta = self.secondary_parameters[10]
             self.l = self.secondary_parameters[8]
             self.J = self.secondary_parameters[11]
-
-            self.tau = 1.689
-            self.wc = 8.465
-            self.wr = 79.258
-            self.Rs = 0.002
-            self.Rr = 0.095
-            self.Ls = 0.00001
-            self.Lrs = 0.00002
-            self.delta = 0.043
-            self.l = 3.1
-            self.J = 2615
 
             self.Urxx = self.secondary_parameters[0]/np.sqrt(3)*1000*self.Rr*math.pi*self.delta*math.pi/(100*math.pi*math.sqrt(2)*self.wc*self.wr*self.mu0*2*self.tau*self.l)
             self.Mnom = self.secondary_parameters[1]/(100*np.pi)

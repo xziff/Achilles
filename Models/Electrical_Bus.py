@@ -6,7 +6,7 @@ import matplotlib.pyplot as plt
 from scipy. integrate import odeint
 import numpy as np
 
-k_size = 6
+k_size = 7
 state_menu = 0
 def create_image_for_model(pass_obj):
     buff_image = ImageTk.PhotoImage(Image.open(pass_obj))
@@ -19,7 +19,7 @@ n_fig = 1
     
 class Electrical_Bus:
     state_click = 0
-    k_expand = 6
+    k_expand = 7
     number_of_connection = 0
 
     def __init__(self, init_x, init_y, position, canv, root):

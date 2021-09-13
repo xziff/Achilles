@@ -39,11 +39,18 @@ list_text_initial_conditions = ["Ток фазы 'A' на стороне тре�
     "Ток фазы 'B' на стороне звезды, А",
     "Ток фазы 'C' на стороне звезды, А"]
 
+coords_text = [
+    [541, -48, "s"],
+    [847, 516, 'w'],
+    [541, -48, "s"],
+    [847, 516, 'w']
+]
+
 class DWT_YD_11(Base_model):
 
-    def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters):
+    def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters, Comdobox_index):
 
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/DWT_YD_11/", coord, position, list_nodes, list_graph, initial_secondary_parameters, "DWT_YD_11", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/DWT_YD_11/", coord, position, list_nodes, list_graph, initial_secondary_parameters, "DWT_YD_11", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires, coords_text, Comdobox_index)
 
         self.width_input = 6
         self.width_matrix = 6

@@ -36,7 +36,7 @@ class Wire:
             for i in range(len(self.coords_wire) - 1):
                 w_x, w_y = self.coords_wire[i]
                 w_x_new, w_y_new = self.coords_wire[i + 1]
-                self.canvas_object_wire.append(self.canv.create_line(w_x, w_y, w_x_new, w_y_new, width = 3.5))
+                self.canvas_object_wire.append(self.canv.create_line(w_x, w_y, w_x_new, w_y_new, width = 3.01))
         self.size_con = 4
         self.delta_for_points_wire = []
         self.quad_con = self.canv.create_rectangle(self.coords_wire[0][0] - self.size_con, self.coords_wire[0][1] - self.size_con, self.coords_wire[0][0] + self.size_con, self.coords_wire[0][1] + self.size_con, width = 2, fill = "black")
@@ -118,7 +118,7 @@ class Wire:
                 for i in range(len(self.coords_wire) - 1):
                     w_x, w_y = self.coords_wire[i]
                     w_x_new, w_y_new = self.coords_wire[i + 1]
-                    self.canvas_object_wire.append(self.canv.create_line(w_x, w_y, w_x_new, w_y_new, width = 3.5))
+                    self.canvas_object_wire.append(self.canv.create_line(w_x, w_y, w_x_new, w_y_new, width = 3.01))
 
             return self.text_tag
         else:
@@ -175,7 +175,7 @@ class Base_model:
 
     def __init__(self, init_x, init_y, canv, root, path_to_image_model, dxdy, position, list_nodes, 
     list_graph, initial_secondary_parameters, name_model,
-    list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires):
+    list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires, coords_text, Comdobox_index):
 
         self.mu0 = np.float64(4*np.pi*10**(-7))
         self.list_text_control_actions = list_text_control_actions
@@ -208,9 +208,10 @@ class Base_model:
             self.set_primary_parameters()
         self.list_graph = list_graph
         self.list_nodes = list_nodes
+        self.coords_text = coords_text
         self.canv = canv
         self.root = root
-        self.k_size = 6
+        self.k_size = 7
         self.dxdy = []
         for i in range(len(dxdy)):
             self.dxdy.append([])
@@ -246,6 +247,11 @@ class Base_model:
         self.replace_state = False
         self.create_rect_indication_outline_selection = False #
         self.data_type = np.float64
+        self.Comdobox_index = Comdobox_index
+        self.type_model_name = self.list_text_example_models[Comdobox_index]
+
+        #Созданиие текстового объекта имя модели
+        self.name_model_obj = self.canv.create_text(self.x+self.coords_text[self.position][0]/self.k_size, self.y+self.coords_text[self.position][1]/self.k_size, text = self.type_model_name, fill = "black", font = ("GOST Type A", "14"), anchor = self.coords_text[self.position][2]) 
 
     def get_first(self):
         return self.list_initial_conditions
@@ -274,6 +280,7 @@ class Base_model:
     def move_model(self, m_x, m_y):
         if (self.state_click  == 1):
             self.canv.coords(self.image_model, m_x - self.delta_x, m_y - self.delta_y)
+            self.canv.coords(self.name_model_obj, m_x - self.delta_x+self.coords_text[self.position][0]/self.k_size, m_y - self.delta_y+self.coords_text[self.position][1]/self.k_size)
             self.x = m_x - self.delta_x
             self.y = m_y - self.delta_y
             if self.replace_state:
@@ -328,8 +335,10 @@ class Base_model:
             self.canv.delete(self.image_model)
             self.delta_x = self.image_width/2
             self.delta_y = self.image_height/2
-            self.image_model = self.canv.create_image(m_x - self.k_click*self.image_width, m_y - self.k_click*self.image_height,image = self.image_model_data, anchor = 'nw')
-            self.canv.coords(self.click_indication, m_x - self.k_click*self.image_width, m_y - self.k_click*self.image_height, m_x - self.k_click*self.image_width + self.image_width, m_y - self.k_click*self.image_height + self.image_height) 
+            self.image_model = self.canv.create_image(m_x - self.image_width/2, m_y - self.image_height/2,image = self.image_model_data, anchor = 'nw')
+            self.canv.coords(self.click_indication, m_x - self.image_width/2, m_y - self.image_height/2, m_x + self.image_width/2, m_y + self.image_height/2)
+            self.canv.itemconfig(self.name_model_obj, anchor = self.coords_text[self.position][2])
+            self.canv.coords(self.name_model_obj, m_x - self.delta_x+self.coords_text[self.position][0]/self.k_size, m_y - self.delta_y+self.coords_text[self.position][1]/self.k_size) 
 
             self.connection_coords = self.dxdy[self.position]
             for i in self.list_wires:
@@ -378,6 +387,8 @@ class Base_model:
 
     def set_secondary_parameters(self):
         def on_closing():
+            self.type_model_name = self.list_text_example_models[list_example.current()]
+            self.canv.itemconfig(self.name_model_obj, text = self.type_model_name)
             if (list_example.current() == 0):
                 for i in range(len(self.list_text_secondary_parameters)):
                     try:
@@ -396,12 +407,13 @@ class Base_model:
 
         def ComboboxSelected(event):
             if (list_example.current() != 0):
+                self.Comdobox_index = list_example.current()
                 for i in range(len(list_string_variable)):
                     list_string_variable[i].set(str(round(self.list_example_parameters[list_example.current()-1][i], 5)))
             
         list_example = ttk.Combobox(secondary_parameters_window, values = self.list_text_example_models,state="readonly", font=('GOST Type A', 16), width= 16)
         list_example.bind("<<ComboboxSelected>>", ComboboxSelected)
-        list_example.current(0)
+        list_example.current(self.Comdobox_index)
         list_string_variable = []
 
         ttk.Separator(secondary_parameters_window, orient=VERTICAL).grid(column=1, row=0, rowspan=len(self.list_text_secondary_parameters)*2 + 2, sticky='ns') 

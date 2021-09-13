@@ -1,12 +1,7 @@
 import pickle
 
+#from main import add_model
 from Models.Electrical_Bus import Electrical_Bus
-from Models.DWT_YD_11 import DWT_YD_11
-from Models.NPSG_Y import NPSG_Y
-from Models.WRIM import WRIM
-from Models.ES import ES
-from Models.SS import SS
-from Models.SL_Y import SL_Y
 
 def save_models_nodes(path_str, list_models, list_nodes):
     with open('saves_schemes/' + path_str + '.pickle', 'wb') as f:
@@ -21,7 +16,16 @@ def save_models_nodes(path_str, list_models, list_nodes):
                     else:
                         initial_list_wires.append(k.coords_wire)
 
-                list_save_parameters[-1].append([j.x, j.y, j.position, initial_list_wires, j.list_params, j.list_initial_conditions, j.secondary_parameters
+                if (j.list_params == [[[],[]]] * len(j.list_text_secondary_parameters)):
+                    P1 = None
+                else:
+                    P1 = j.list_params 
+                if (j.secondary_parameters == []):
+                    P2 = None
+                else:
+                    P2 = j.secondary_parameters
+
+                list_save_parameters[-1].append([j.x, j.y, j.position, initial_list_wires, P1, j.list_initial_conditions, P2, j.Comdobox_index
                 ])
         pickle.dump(list_save_parameters, f)
 
@@ -31,22 +35,13 @@ def save_models_nodes(path_str, list_models, list_nodes):
                 ])
         pickle.dump(list_save_parameters, f)
 
-def load_models_nodes(path_str, list_models, list_nodes, canv, root):
+def load_models_nodes(path_str, list_models, list_nodes, canv, root, add_model):
     with open('saves_schemes/' + path_str, 'rb') as f:
         data = pickle.load(f)
 
-        for i in data[0]:
-            list_models[0].append(DWT_YD_11(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
-        for i in data[1]:
-            list_models[1].append(NPSG_Y(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
-        for i in data[2]:
-            list_models[2].append(WRIM(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
-        for i in data[3]:
-            list_models[3].append(ES(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
-        for i in data[4]:
-            list_models[4].append(SS(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
-        for i in data[5]:
-            list_models[5].append(SL_Y(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
+        for i in range(len(data)):
+            for j in data[i]:
+                add_model(i, j[0], j[1], j[2], canv, root, j[3], j[4], j[5], j[6], j[7])
 
         data = pickle.load(f)
         for i in data:

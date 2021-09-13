@@ -4,7 +4,7 @@ import os
 import tkinter.font as font
 
 from BD import update_dictionary
-update_dictionary()
+#update_dictionary()
 
 from Models.Electrical_Bus import Electrical_Bus
 from Models.DWT_YD_11 import DWT_YD_11
@@ -13,8 +13,9 @@ from Models.WRIM import WRIM
 from Models.ES import ES
 from Models.SS import SS
 from Models.SL_Y import SL_Y
+from Models.TwSSW_YD_11 import TwSSW_YD_11
 
-from tree_window import get_tree_window, add_model
+from tree_window import get_tree_window
 from calc import calculations
 from save_and_load import save_models_nodes, load_models_nodes
 
@@ -23,24 +24,60 @@ scheme_replace = False
 max_t = 0
 max_point = 0
 
-#Массив узлов
-list_nodes = []
+def create_lists():
+    global list_nodes, list_models
 
-#Массив всех моделей
-list_models = []
-list_models.append([]) #Трансформатор
-list_models.append([]) #Синхронная машина
-list_models.append([]) #Асинхронная машина
-list_models.append([]) #Система
-list_models.append([]) #Выключатель
-list_models.append([]) #Статическая нагрузка
+    #Массив узлов
+    list_nodes = []
+
+    #Массив всех моделей
+    list_models = []
+    list_models.append([]) #Трансформатор
+    list_models.append([]) #Синхронная машина
+    list_models.append([]) #Асинхронная машина
+    list_models.append([]) #Система
+    list_models.append([]) #Выключатель
+    list_models.append([]) #Статическая нагрузка
+    list_models.append([]) #Трансформатор с расщепенной обмоткой
+
+create_lists()
+
+def add_model(number_model, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10):
+    global list_models
+    if (number_model == 0):
+        list_models[number_model].append(DWT_YD_11(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10))
+    elif (number_model == 1):
+        list_models[number_model].append(NPSG_Y(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10))
+    elif (number_model == 2):
+        list_models[number_model].append(WRIM(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10))
+    elif (number_model == 3):
+        list_models[number_model].append(ES(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10))
+    elif (number_model == 4):
+        list_models[number_model].append(SS(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10))
+    elif (number_model == 5):
+        list_models[number_model].append(SL_Y(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10))
+    elif (number_model == 6):
+        list_models[number_model].append(TwSSW_YD_11(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10))
+    
 
 #Команды кнопок на экране
 def b1_command():
     tree, tree_window = get_tree_window(root)
     def OnDoubleClick(event):
         item = tree.identify('item',event.x,event.y)
-        add_model(list_models, list_nodes, tree.item(item)['text'], WIDTH, HEIGHT, canv, root)
+        num = tree.item(item)['tags'][0]
+        if (num != "node"):
+            add_model(num, WIDTH, HEIGHT, 0, canv, root, None, None, None, None, 0)
+            list_models[num][-1].state_click = 1
+            list_models[num][-1].delta_x = list_models[num][-1].image_width/2
+            list_models[num][-1].delta_y = list_models[num][-1].image_height/2
+            list_models[num][-1].click_indication = canv.create_rectangle(list_models[num][-1].x, list_models[num][-1].y, list_models[num][-1].x + list_models[num][-1].image_width, list_models[num][-1].y + list_models[num][-1].image_height, width = 2, outline = "red")
+        else:
+            list_nodes.append(Electrical_Bus(WIDTH, HEIGHT, 0, canv, root))
+            list_nodes[-1].state_click = 1
+            list_nodes[-1].delta_x = list_nodes[-1].image_width/2
+            list_nodes[-1].delta_y = list_nodes[-1].image_height/2
+
         tree_window.destroy()
     tree.bind("<Double-1>", OnDoubleClick)
 
@@ -74,16 +111,9 @@ def load_scheme():
         for i in list_nodes:
             i.delete_node(list_models)
 
-        list_nodes = []
-        list_models = []
-        list_models.append([]) #Трансформатор
-        list_models.append([]) #Синхронная машина
-        list_models.append([]) #Асинхронная машина
-        list_models.append([]) #Система
-        list_models.append([]) #Выключатель
-        list_models.append([]) #Статическая нагрузка
+        create_lists()
 
-        load_models_nodes(list_files.get(), list_models, list_nodes, canv, root)
+        load_models_nodes(list_files.get(), list_models, list_nodes, canv, root, add_model)
         load_window.destroy()
 
     load_window = Toplevel(root, bg = "white")
@@ -257,6 +287,10 @@ def view(event):
             if (j != "Deleted"):
                 j.view_results()
 
+def expand_bus(event):
+    for i in list_nodes:
+        i.expand_image_model(event.x, event.y)
+
 def get_menu(event):
     Press_model = False
     for i in list_models:
@@ -414,25 +448,11 @@ def paste():
             canv.delete(i.rect_indication_outline_selection)
         except AttributeError:
             pass
-
-    for i in copy_list_model[0]:
-        list_models[0].append(DWT_YD_11(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
-        help_m(list_models[0][-1])
-    for i in copy_list_model[1]:
-        list_models[1].append(NPSG_Y(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
-        help_m(list_models[1][-1])
-    for i in copy_list_model[2]:
-        list_models[2].append(WRIM(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
-        help_m(list_models[2][-1])
-    for i in copy_list_model[3]:
-        list_models[3].append(ES(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
-        help_m(list_models[3][-1])
-    for i in copy_list_model[4]:
-        list_models[4].append(SS(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
-        help_m(list_models[4][-1])
-    for i in copy_list_model[5]:
-        list_models[5].append(SL_Y(i[0], i[1], i[2], canv, root, i[3], i[4], i[5], i[6]))
-        help_m(list_models[5][-1])
+    
+    for i in range(len(copy_list_model)):
+        for j in copy_list_model[i]:
+            add_model(i, j[0], j[1], j[2], canv, root, j[3], j[4], j[5], j[6], j[7])
+            help_m(list_models[i][-1])
 
     for i in copy_list_node:
         list_nodes.append(Electrical_Bus(i[0], i[1], i[2], canv, root))
@@ -460,8 +480,17 @@ def copy():
                         else:
                             initial_list_wires.append("not exist")
                     else:
-                        initial_list_wires.append("not exist")      
-                copy_list_model[-1].append([j.x + WIDTH, j.y + HEIGHT, j.position, initial_list_wires, j.list_params, j.list_initial_conditions, j.secondary_parameters])
+                        initial_list_wires.append("not exist") 
+                if (j.list_params == [[[],[]]] * len(j.list_text_control_actions)):
+                    P1 = None
+                else:
+                    P1 = j.list_params 
+                if (j.secondary_parameters == []):
+                    P2 = None
+                else:
+                    P2 = j.secondary_parameters
+
+                copy_list_model[-1].append([j.x + WIDTH, j.y + HEIGHT, j.position, initial_list_wires, P1, j.list_initial_conditions, P2, j.Comdobox_index])
 
 
     global copy_list_node
@@ -546,6 +575,7 @@ canv.bind('<Motion>', mouse_motion)
 canv.bind('<ButtonRelease-1>', click_1_release)
 
 root.bind('r', rotation)
+root.bind('e', expand_bus)
 root.bind('n', get_list_nodes)
 root.bind('v', paste)
 

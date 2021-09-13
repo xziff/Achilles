@@ -8,6 +8,7 @@ from Models.WRIM import WRIM
 from Models.ES import ES
 from Models.SS import SS
 from Models.SL_Y import SL_Y
+from Models.TwSSW_YD_11 import TwSSW_YD_11
 
 def add_model(mass_model, list_nodes, return_text, WIDTH, HEIGHT, canv, root):
     if (return_text == "Обычный узел"):
@@ -34,6 +35,9 @@ def add_model(mass_model, list_nodes, return_text, WIDTH, HEIGHT, canv, root):
         elif (return_text == "Статическаая нагрузка"):
             m_i = 5
             mass_model[5].append(SL_Y(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
+        elif (return_text == "Трансформатор с расщепленной обмоткой"):
+            m_i = 6
+            mass_model[6].append(TwSSW_YD_11(WIDTH, HEIGHT, 0, canv, root, None, None, None, None))
         else:
             print("Error")
         mass_model[m_i][-1].state_click = 1
@@ -57,27 +61,21 @@ def get_tree_window(root):
 
     tree.heading('#0', text='Список моделей', anchor='w')
 
-    tree.insert('', END, text='Элеткрические узлы', iid=0, open=False, tags= ('H',))
-    tree.insert('', END, text='Обычный узел', iid=1, open=False)
-    tree.move(1, 0, 0)
+    nodes = tree.insert("", 1, text="Элеткрические узлы")
+    tree.insert(nodes, "end", text="Обычный узел", tags= ('node',))
 
-    tree.insert('', END, text='Трансформаторы', iid=2, open=False, tags= ('H',))
-    tree.insert('', END, text='Звезда-треугольник-11', iid=3, open=False)
-    tree.move(3, 2, 0)
-    
-    tree.insert('', END, text='Вращающиеся электрические машины', iid=4, open=False, tags= ('H',))
-    tree.insert('', END, text='Синхронная машина', iid=5, open=False)
-    tree.move(5, 4, 0)
-    tree.insert('', END, text='Асинхронная машина', iid=6, open=False)
-    tree.move(6, 4, 0)
+    Trans = tree.insert("", 2, text="Трансформаторы")
+    tree.insert(Trans, "end", text="Звезда-треугольник-11", tags= ('0',))
+    tree.insert(Trans, "end", text='Трансформатор с расщепленной обмоткой', tags= ('6',))
 
-    tree.insert('', END, text='Другое', iid=7, open=False, tags= ('H',))
-    tree.insert('', END, text='Система', iid=8, open=False)
-    tree.move(8, 7, 0)
-    tree.insert('', END, text='Вылючатель', iid=9, open=False)
-    tree.move(9, 7, 0)
-    tree.insert('', END, text='Статическаая нагрузка', iid=10, open=False)
-    tree.move(10, 7, 0)
+    rotM = tree.insert("", 3, text="Вращающиеся электрические машины")
+    tree.insert(rotM, "end", text="Синхронная машина", tags= ('1',))
+    tree.insert(rotM, "end", text="Асинхронная машина", tags= ('2',))
+
+    anoter = tree.insert("", 4, text="Другое")
+    tree.insert(anoter, "end", text="Система", tags= ('3',))
+    tree.insert(anoter, "end", text="Вылючатель", tags= ('4',))
+    tree.insert(anoter, "end", text="Статическаая нагрузкаа", tags= ('5',))
 
     tree.grid(row=0, column=0, sticky='nsew')
 

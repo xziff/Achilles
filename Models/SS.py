@@ -23,11 +23,18 @@ list_text_control_actions = {"Позиции выключателя": ["Врем
 list_text_initial_conditions = ["Ток фазы 'А' статора, А",
     "Ток фазы 'B' статора, А"]
 
+coords_text = [
+    [223, -40, "s"],
+    [174, 223, 'w'],
+    [223, -40, "s"],
+    [174, 223, 'w']
+]
+
 class SS(Base_model):
 
-    def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters):
+    def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters, Comdobox_index):
 
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/SS/", coord, position, list_nodes, list_graph, initial_secondary_parameters, "SS", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/SS/", coord, position, list_nodes, list_graph, initial_secondary_parameters, "SS", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires, coords_text, Comdobox_index)
 
         self.width_input = 2
         self.width_matrix = 2
@@ -148,9 +155,10 @@ class SS(Base_model):
 
 
     def corrent_list_params(self):
-        if (self.list_params[0][1][0] == 0):
-            self.inital_position_switch = False
-        else:
-            self.inital_position_switch = True
-        self.position_switch = self.inital_position_switch
-        self.switch_time = self.list_params[0][0]
+        if (self.list_params != [[[],[]]]):
+            if (self.list_params[0][1][0] == 0):
+                self.inital_position_switch = False
+            else:
+                self.inital_position_switch = True
+            self.position_switch = self.inital_position_switch
+            self.switch_time = self.list_params[0][0]

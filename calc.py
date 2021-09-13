@@ -76,6 +76,8 @@ def communacation_matrix(list_nodes, list_models, main_list):
                 if (repeat_num == 0):
                     mass_repeat.append(ii)
 
+            print(help_voltage_matrix)
+
             for ii in mass_repeat:
                 for jj in range(len(help_voltage_matrix)):
                     del help_voltage_matrix[jj][ii]
@@ -171,6 +173,8 @@ def communacation_matrix(list_nodes, list_models, main_list):
         for j in range(len(all_voltage_matrix[0])):
             all_current_matrix[ii].append(0)
 
+    print("sdfsdf")
+
     return np.array(all_voltage_matrix, dtype = data_type), np.array(all_current_matrix, dtype = data_type)
 
 def return_graphs(main_list, list_models, results, t):
@@ -238,14 +242,14 @@ def calculations(list_nodes, list_models, t_max, t_del):
 
             if (bool_start == False):
                 main_det = np.zeros((height_matrix, width_matrix), dtype = data_type)
-                own_matrix = list_models[type_model][number_moder].get_own_matrix(y[wait_index:(wait_index+width_input)], t)
+                own_matrix = list_models[type_model][number_moder].get_own_matrix(np.array(y[wait_index:(wait_index+width_input)], dtype = data_type), t)
                 bool_start = True
             else:   
                 main_det = np.hstack((main_det, np.zeros((main_det.shape[0], width_matrix), dtype = data_type)))  
                 main_det = np.vstack((main_det, np.zeros((height_matrix, main_det.shape[1]), dtype = data_type)))
-                own_matrix = np.hstack((own_matrix, list_models[type_model][number_moder].get_own_matrix(y[wait_index:(wait_index+width_input)], t)))
+                own_matrix = np.hstack((own_matrix, list_models[type_model][number_moder].get_own_matrix(np.array(y[wait_index:(wait_index+width_input)], dtype = data_type), t)))
 
-            buffer_det = list_models[type_model][number_moder].get_main_determinant(y[wait_index:(wait_index+width_input)], t)
+            buffer_det = list_models[type_model][number_moder].get_main_determinant(np.array(y[wait_index:(wait_index+width_input)], dtype = data_type), t)
 
             for i in range(height_matrix):
                 for j in range(width_matrix):

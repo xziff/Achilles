@@ -24,11 +24,18 @@ list_text_control_actions = {}
 list_text_initial_conditions = ["Ток фазы 'А', А",
     "Ток фазы 'B', А"]
 
+coords_text = [
+    [260, -40, "s"],
+    [434, 228, 'w'],
+    [260, -40, "s"],
+    [434, 228, 'w']
+]
+
 class SL_Y(Base_model):
 
-    def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters):
+    def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters, Comdobox_index):
 
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/SL_Y/", coord, position, list_nodes, list_graph, initial_secondary_parameters, "SL_Y", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/SL_Y/", coord, position, list_nodes, list_graph, initial_secondary_parameters, "SL_Y", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires, coords_text, Comdobox_index)
         ###
 
         self.width_input = 2
@@ -63,6 +70,6 @@ class SL_Y(Base_model):
 
     def set_primary_parameters(self):
         if (self.secondary_parameters != ["Нет данных"] * len(self.list_text_secondary_parameters)):
-            self.R = self.secondary_parameters[0]**2/self.secondary_parameters[1]
-            self.L = self.secondary_parameters[0]**2/self.secondary_parameters[2]/(100*np.pi)
+            self.R = 0.0001
+            self.L = 0
             print(self.R, self.L)
