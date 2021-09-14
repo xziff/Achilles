@@ -249,6 +249,7 @@ class Base_model:
         self.data_type = np.float64
         self.Comdobox_index = Comdobox_index
         self.type_model_name = self.list_text_example_models[Comdobox_index]
+        self.type_switch = False
 
         #Созданиие текстового объекта имя модели
         self.name_model_obj = self.canv.create_text(self.x+self.coords_text[self.position][0]/self.k_size, self.y+self.coords_text[self.position][1]/self.k_size, text = self.type_model_name, fill = "black", font = ("GOST Type A", "14"), anchor = self.coords_text[self.position][2]) 
@@ -562,3 +563,67 @@ class Base_model:
     def delete_outline_model(self):
         self.create_rect_indication_outline_selection = False
         self.canv.delete(self.rect_indication_outline_selection)
+
+    def get_interrupt_time(self):
+        list_interrupt = []
+        for i in range(len(self.switch_time)):
+            if self.inital_position_switch:
+                if (i%2 == 0):
+                    list_interrupt.append(self.switch_time[i])
+                else:
+                    list_interrupt.append(self.switch_time[i] + self.dt)
+            else:
+                if (i%2 == 0):
+                    if (self.switch_time[i] == 0):
+                        list_interrupt.append(self.switch_time[i] + 0)
+                    else:
+                        list_interrupt.append(self.switch_time[i] + self.dt)
+                else:
+                    list_interrupt.append(self.switch_time[i])
+        return list_interrupt
+
+    def check_switch(self, t):
+        for i in self.switch_time:
+            if (t >= i):
+                current_switch_time = i
+            else:
+                break
+        if (current_switch_time == 0):
+            self.start_position = True
+        else:
+            self.start_position = False
+        self.index_current_switch_time = self.switch_time.index(current_switch_time)
+        if self.inital_position_switch:
+            if (self.index_current_switch_time%2 == 0):
+                self.position_switch = True
+                self.list_wires[0].text_tag = "Q1:ON_SWITCH"
+                #self.list_wires[1].text_tag = "Q2:ON_SWITCH"
+            else:
+                self.position_switch = False
+                self.list_wires[0].text_tag = "Q1:OFF_SWITCH"
+                #self.list_wires[1].text_tag = "Q2:OFF_SWITCH"
+        else:
+            if (self.index_current_switch_time%2 == 0):
+                self.position_switch = False
+                self.list_wires[0].text_tag = "Q1:OFF_SWITCH"
+                #self.list_wires[1].text_tag = "Q2:OFF_SWITCH"
+            else:
+                self.position_switch = True
+                self.list_wires[0].text_tag = "Q1:ON_SWITCH"
+                #self.list_wires[1].text_tag = "Q2:ON_SWITCH"
+    
+    def help_ss(self, t):
+        if not self.start_position:
+            if (self.position_switch == False):
+                if (t - self.switch_time[self.index_current_switch_time] < self.dt):
+                    self.Roff = 10000/self.dt*(t - self.switch_time[self.index_current_switch_time])
+                    self.Loff = 1/self.dt*(t - self.switch_time[self.index_current_switch_time])  
+                else:
+                    self.Roff = 0
+                    self.Loff = 0
+            else:
+                if (t - self.switch_time[self.index_current_switch_time] < self.dt):
+                    self.Loff = 0.00002*(1-1/self.dt*(t - self.switch_time[self.index_current_switch_time])) 
+                else:
+                    self.Loff = 0
+                self.Roff = 0

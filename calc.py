@@ -200,6 +200,12 @@ def calculations(list_nodes, list_models, t_max, t_del):
     all_voltage_matrix, all_current_matrix = communacation_matrix(list_nodes, list_models, main_list)
 
     time_interrupt = []
+    for i in list_models:
+        for j in i:
+            if j.type_switch:
+                for k in j.get_interrupt_time():
+                    time_interrupt.append(k)
+
     for i in list_models[4]:
         for j in i.get_interrupt_time():
             time_interrupt.append(j)
@@ -215,8 +221,10 @@ def calculations(list_nodes, list_models, t_max, t_del):
 
         bool_start = False
 
-        for i in list_models[4]:
-            i.check_switch(t)
+        for i in list_models:
+            for j in i:
+                if j.type_switch:
+                    j.check_switch(t)
 
         ###
         for i in range(len(time_interrupt)):

@@ -4,7 +4,7 @@ import os
 import tkinter.font as font
 
 from BD import update_dictionary
-#update_dictionary()
+update_dictionary()
 
 from Models.Electrical_Bus import Electrical_Bus
 from Models.DWT_YD_11 import DWT_YD_11
@@ -14,6 +14,8 @@ from Models.ES import ES
 from Models.SS import SS
 from Models.SL_Y import SL_Y
 from Models.TwSSW_YD_11 import TwSSW_YD_11
+from Models.KZ_3 import KZ_3
+from Models.KZ_1_0 import KZ_1_0
 
 from tree_window import get_tree_window
 from calc import calculations
@@ -39,6 +41,8 @@ def create_lists():
     list_models.append([]) #Выключатель
     list_models.append([]) #Статическая нагрузка
     list_models.append([]) #Трансформатор с расщепенной обмоткой
+    list_models.append([]) #Трехфазное короткое замыкание
+    list_models.append([]) #Однофазное короткое замыкание на землю
 
 create_lists()
 
@@ -58,6 +62,10 @@ def add_model(number_model, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10):
         list_models[number_model].append(SL_Y(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10))
     elif (number_model == 6):
         list_models[number_model].append(TwSSW_YD_11(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10))
+    elif (number_model == 7):
+        list_models[number_model].append(KZ_3(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10))
+    elif (number_model == 8):
+        list_models[number_model].append(KZ_1_0(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10))
     
 
 #Команды кнопок на экране
@@ -152,8 +160,9 @@ def click_1(event):
         for i in list_models:
             for j in i:
                 if (j != "Deleted"):
-                    j.set_state_click(event.x, event.y)
-                    j.wire_connection(event.x, event.y)
+                    if not Press_model:
+                        j.set_state_click(event.x, event.y)
+                        j.wire_connection(event.x, event.y)
                     for k in j.list_wires:
                         if (k != "not exist"):
                             k.add_wire_node(event.x, event.y)

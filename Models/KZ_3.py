@@ -9,32 +9,33 @@ import numpy as np
 from Models.base_model import Base_model
 
 coord = [
-    [[430, 66], [8, 66]],
-    [[58, 428], [58, 9]],
-    [[430, 66], [8, 66]],
-    [[58, 428], [58, 9]]]
+    [[87, 9]],
+    [[87, 9]],
+    [[87, 9]],
+    [[87, 9]]
+]
 
-list_nodes = ["Q1:ON_SWITCH", "Q2:ON_SWITCH"]
+list_nodes = ["Q1:ON_SWITCH"]
 
 list_graph = [0, 1]
 
-list_text_control_actions = {"Позиции выключателя": ["Время, с", "Позиция"]}
+list_text_control_actions = {"Позиции КЗ": ["Время, с", "Позиция"]}
 
 list_text_initial_conditions = ["Ток фазы 'А' статора, А",
-    "Ток фазы 'B' статора, А"]
+    "Ток фазы 'B' статора, А",]
 
 coords_text = [
-    [223, -40, "s"],
-    [174, 223, 'w'],
-    [223, -40, "s"],
-    [174, 223, 'w']
+    [152, 234, "w"],
+    [152, 234, 'w'],
+    [152, 234, "w"],
+    [152, 234, 'w']
 ]
 
-class SS(Base_model):
+class KZ_3(Base_model):
 
     def __init__(self, init_x, init_y, position, canv, root, initial_list_wires, initial_control_actions, initial_initial_conditions, initial_secondary_parameters, Comdobox_index):
 
-        Base_model.__init__(self, init_x, init_y, canv, root, "Image/SS/", coord, position, list_nodes, list_graph, initial_secondary_parameters, "SS", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires, coords_text, Comdobox_index)
+        Base_model.__init__(self, init_x, init_y, canv, root, "Image/KZ_3/", coord, position, list_nodes, list_graph, initial_secondary_parameters, "KZ", list_text_control_actions, list_text_initial_conditions, initial_control_actions, initial_initial_conditions, initial_list_wires, coords_text, Comdobox_index)
 
         self.width_input = 2
         self.width_matrix = 2
@@ -69,10 +70,6 @@ class SS(Base_model):
             voltage_matrix = [[-1, 0],
                             [0, -1]
                         ] 
-        if (parameter == "Q2"):
-            voltage_matrix = [[1, 0],
-                            [0, 1]
-                            ] 
         return voltage_matrix
 
     def get_current_matrix(self, parameter):
@@ -80,11 +77,6 @@ class SS(Base_model):
             current_matrix = [[-1, 0],
                             [0, -1],
                             [1, 1]
-                            ] 
-        if (parameter == "Q2"):
-            current_matrix = [[1, 0],
-                            [0, 1],
-                            [-1, -1]
                             ] 
         return current_matrix
 

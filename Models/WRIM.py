@@ -58,7 +58,7 @@ class WRIM(Base_model):
         self.width_matrix = 6
         self.height_matrix = 6
 
-        self.N = 5
+        self.N = 1
 
     def f_A(self, angle):
         result = 0

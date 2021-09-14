@@ -77,6 +77,10 @@ def get_tree_window(root):
     tree.insert(anoter, "end", text="Вылючатель", tags= ('4',))
     tree.insert(anoter, "end", text="Статическаая нагрузкаа", tags= ('5',))
 
+    KZ = tree.insert("", 5, text="Короткое замыкание")
+    tree.insert(KZ, "end", text="Трехфазное короткое замыкание", tags= ('7',))
+    tree.insert(KZ, "end", text="Однофазное короткое замыкание на землю", tags= ('8',))
+
     tree.grid(row=0, column=0, sticky='nsew')
 
     return tree, tree_window
