@@ -28,7 +28,7 @@ coord = [
 
 list_nodes = ["Q:ON_SWITCH"]
 
-list_graph = [0, 1, 2, 3, 6]
+list_graph = [0, 6]
 
 list_text_control_actions = {"Нагрузочный момент": ["s, %", "M(s), кН*м"], "Сопротивление реостата, доли Rr": ["s, %", "N(s), о.е."]}
 

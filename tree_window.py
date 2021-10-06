@@ -80,6 +80,7 @@ def get_tree_window(root):
     KZ = tree.insert("", 5, text="Короткое замыкание")
     tree.insert(KZ, "end", text="Трехфазное короткое замыкание", tags= ('7',))
     tree.insert(KZ, "end", text="Однофазное короткое замыкание на землю", tags= ('8',))
+    tree.insert(KZ, "end", text="Двухфазное короткое замыкание", tags= ('9',))
 
     tree.grid(row=0, column=0, sticky='nsew')
 

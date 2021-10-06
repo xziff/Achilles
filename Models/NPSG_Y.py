@@ -31,7 +31,7 @@ coord = [
 
 list_nodes = ["Q:ON_SWITCH"]
 
-list_graph = [0, 2, 3]
+list_graph = [0, 1, 2, 3]
 
 list_text_control_actions = {"Механический момент": ["t, с", "M(t), кН*м"], "Напряжение возбуждения": ["t, с", "Uв(t), В"]}
 
@@ -60,14 +60,18 @@ class NPSG_Y(Base_model):
     def get_main_determinant(self, input_variable, t):
         main_determinant = np.array([[-(2*self.wc*self.wc*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(1 + (-1)*np.sin(np.pi/2 - 2*np.pi/3) - (-1)*np.sin(np.pi/6) - (-1)*(-1)*np.sin(np.pi/6 + 2*np.pi/3)) - self.Ls, -(2*self.wc*self.wc*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(np.sin(np.pi/2 + 2*np.pi/3) + (-1)*np.sin(np.pi/2 - 2*np.pi/3) - (-1)*np.sin(np.pi/6 - 2*np.pi/3) - (-1)*(-1)*np.sin(np.pi/6 + 2*np.pi/3)) + self.Ls, -(2*self.wc*self.wr*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(np.sin(np.pi/2+input_variable[4]) - (-1)*np.sin(np.pi/6-input_variable[4]))],
     	                   [-(2*self.wc*self.wc*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*((-1)*np.sin(np.pi/6) + (-1)*(-1)*np.sin(np.pi/6 + 2*np.pi/3) - np.sin(-np.pi/6) - (-1)*np.sin(-np.pi/6 + 2*np.pi/3))  - self.Ls, -(2*self.wc*self.wc*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*((-1)*np.sin(np.pi/6 - 2*np.pi/3) + (-1)*(-1)*np.sin(np.pi/6 + 2*np.pi/3) - np.sin(-np.pi/6 - 2*np.pi/3) - (-1)*np.sin(-np.pi/6 + 2*np.pi/3)) - self.Ls - self.Ls, -(2*self.wc*self.wr*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*((-1)*np.sin(np.pi/6-input_variable[4]) - np.sin(-np.pi/6-input_variable[4]))],
-    	                   [-(2*self.wc*self.wr*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(np.sin(np.pi/2 - input_variable[4]) + (-1)*np.sin(np.pi/2 - input_variable[4] - 2*np.pi/3)), -(2*self.wc*self.wr*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(np.sin(np.pi/2 - input_variable[4] + 2*np.pi/3) + (-1)*np.sin(np.pi/2 - input_variable[4] - 2*np.pi/3)), -(2*self.wr*self.wr*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(np.sin(np.pi/2)) - self.Lrs]
-    	                  ], dtype = self.data_type)            
+    	                   [-(2*self.wc*self.wr*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(np.sin(np.pi/2  - input_variable[4]) + (-1)*np.sin(np.pi/2 - input_variable[4] - 2*np.pi/3)), -(2*self.wc*self.wr*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(np.sin(np.pi/2 - input_variable[4] + 2*np.pi/3) + (-1)*np.sin(np.pi/2 - input_variable[4] - 2*np.pi/3)), -(2*self.wr*self.wr*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(np.sin(np.pi/2)) - self.Lrs]
+    	                  ], dtype = self.data_type) 
+        if (t == 0):
+            print(main_determinant)           
         return main_determinant
 
     def get_own_matrix(self, input_variable, t):
         own_matrix = np.array([input_variable[0]*self.Rs - input_variable[1]*self.Rs + input_variable[3]*(2*self.wc*self.wr*input_variable[2]*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(np.cos(np.pi/2 + input_variable[4]) + (-1)*np.cos(np.pi/6 - input_variable[4])),
                     input_variable[1]*self.Rs - (-input_variable[0]-input_variable[1])*self.Rs + input_variable[3]*(2*self.wc*self.wr*input_variable[2]*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(-(-1)*np.cos(np.pi/6 - input_variable[4]) + np.cos(-np.pi/6 - input_variable[4])),
                    input_variable[2]*self.Rr - line_func(self.list_params[1], t) - input_variable[3]*(2*self.wc*self.wr*self.mu0*2*self.tau*self.l)/(np.pi*self.delta*np.pi)*(input_variable[0]*np.cos(np.pi/2 - input_variable[4]) + input_variable[1]*np.cos(np.pi/2 - input_variable[4] + 2*np.pi/3) + (-input_variable[0]-input_variable[1])*np.cos(np.pi/2 - input_variable[4] - 2*np.pi/3))], dtype = self.data_type)          
+        if (t == 0):
+            print(own_matrix)  
         return own_matrix
 
     def get_voltage_matrix(self, parameter):
@@ -89,7 +93,7 @@ class NPSG_Y(Base_model):
     def get_additional_variable(self, input_variable, t):
         Melmag = 2*self.tau/np.pi*self.wr*(2*self.wc*input_variable[2]*self.l*self.mu0)/(np.pi*self.delta)*(input_variable[0]*np.cos(np.pi/2 - input_variable[4]) + input_variable[1]*np.cos(np.pi/2 - input_variable[4] + 2*np.pi/3) + (-input_variable[0]-input_variable[1])*np.cos(np.pi/2 - input_variable[4] - 2*np.pi/3))
         additional_variable = np.array([
-                            (1000 * line_func(self.list_params[0], t) - Melmag)/self.J,
+                            (1000 * line_func(self.list_params[0], t) - 1*Melmag)/self.J,
                             input_variable[3]
                             ], dtype = self.data_type)  
         return additional_variable

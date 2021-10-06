@@ -17,7 +17,7 @@ coord = [
 
 list_nodes = ["Q:ON_SWITCH"]
 
-list_graph = [0, 1]
+list_graph = [0, 1, 2]
 
 list_text_control_actions = {}
 
@@ -54,9 +54,11 @@ class ES(Base_model):
         return main_determinant
 
     def get_own_matrix(self, input_variable, t):
-        own_matrix = np.array([self.Uc*np.sqrt(2)*np.sin(2*np.pi*self.fc*t + 0 + self.phic) - self.Uc*np.sqrt(2)*np.sin(2*np.pi*self.fc*t - 2*np.pi/3 + self.phic),
-                    self.Uc*np.sqrt(2)*np.sin(2*np.pi*self.fc*t - 2*np.pi/3 + self.phic) - self.Uc*np.sqrt(2)*np.sin(2*np.pi*self.fc*t + 2*np.pi/3 + self.phic),
-                    self.Uc*np.sqrt(2)*np.sin(2*np.pi*self.fc*t + 2*np.pi/3 + self.phic)
+        al = 2*np.pi/3 #Прямая последовательность напряжений
+        #al = -2*np.pi/3 #Обратная последовательность напряжений
+        own_matrix = np.array([self.Uc*np.sqrt(2)*np.sin(2*np.pi*self.fc*t + 0 + self.phic) - self.Uc*np.sqrt(2)*np.sin(2*np.pi*self.fc*t - al + self.phic),
+                    self.Uc*np.sqrt(2)*np.sin(2*np.pi*self.fc*t - al + self.phic) - self.Uc*np.sqrt(2)*np.sin(2*np.pi*self.fc*t + al + self.phic),
+                    self.Uc*np.sqrt(2)*np.sin(2*np.pi*self.fc*t + al + self.phic)
                     ], dtype = self.data_type)     
         return own_matrix
     

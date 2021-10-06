@@ -188,3 +188,15 @@ class Electrical_Bus:
     def delete_outline_node(self):
         self.create_rect_indication_outline_selection = False
         self.canv.delete(self.rect_indication_outline_selection)
+
+    def view_voltage(self):
+        fig, axs = plt.subplots(len(self.list_voltages))
+        plt.subplots_adjust(left=0.04, right=0.96, top = 0.96, bottom= 0.04, hspace=0)
+        fig.suptitle('Vertically stacked subplots')
+        counter_g = 0
+        for i in self.list_voltages:
+            axs[counter_g].plot(self.t, i, linewidth=1, color='red')
+            axs[counter_g].grid(True)
+            counter_g += 1
+        plt.show()
+

@@ -70,6 +70,6 @@ class SL_Y(Base_model):
 
     def set_primary_parameters(self):
         if (self.secondary_parameters != ["Нет данных"] * len(self.list_text_secondary_parameters)):
-            self.R = 0.0001
-            self.L = 0
+            self.R = 2
+            self.L = 1/100/np.pi
             print(self.R, self.L)

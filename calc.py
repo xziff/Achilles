@@ -32,6 +32,7 @@ def initial_conditions(list_models, main_list):
 def communacation_matrix(list_nodes, list_models, main_list):
     all_voltage_matrix = []    
     all_current_matrix = []
+    help_voltage_node = []
 
     for i in range(len(list_nodes)):
         help_voltage_matrix = []    
@@ -76,14 +77,14 @@ def communacation_matrix(list_nodes, list_models, main_list):
                 if (repeat_num == 0):
                     mass_repeat.append(ii)
 
-            print(help_voltage_matrix)
-
             for ii in mass_repeat:
                 for jj in range(len(help_voltage_matrix)):
                     del help_voltage_matrix[jj][ii]
 
             if (len(help_voltage_matrix[0]) == 2):
                 del help_current_matrix[-1]
+
+            help_voltage_node.append(len(help_voltage_matrix[0]))
 
             if (len(all_voltage_matrix) == 0):
                 for ii in range(len(help_voltage_matrix)):
@@ -173,9 +174,7 @@ def communacation_matrix(list_nodes, list_models, main_list):
         for j in range(len(all_voltage_matrix[0])):
             all_current_matrix[ii].append(0)
 
-    print("sdfsdf")
-
-    return np.array(all_voltage_matrix, dtype = data_type), np.array(all_current_matrix, dtype = data_type)
+    return np.array(all_voltage_matrix, dtype = data_type), np.array(all_current_matrix, dtype = data_type), help_voltage_node
 
 def return_graphs(main_list, list_models, results, t):
     wain_index = 0
@@ -187,9 +186,18 @@ def return_graphs(main_list, list_models, results, t):
             list_models[type_model][number_moder].list_results.append(results[:, wain_index + i])
         wain_index += width_input
         
+def return_voltage_bus(list_nodes, help_voltage_matrix, bus_voltage, t_bus_voltage):
+    wain_index = 0
+    for i in range(len(list_nodes)):
+        list_nodes[i].t = t_bus_voltage
+        list_nodes[i].list_voltages = []
+        for j in range(help_voltage_matrix[i]):
+            list_nodes[i].list_voltages.append(bus_voltage[wain_index + j])
+        wain_index += help_voltage_matrix[i]
 
 
 def calculations(list_nodes, list_models, t_max, t_del):
+    global all_voltage_matrix, all_current_matrix, help_voltage_matrix
     print(t_max, t_del)
     t = np.linspace(0, t_max, t_del)
 
@@ -197,7 +205,13 @@ def calculations(list_nodes, list_models, t_max, t_del):
 
     y0 = initial_conditions(list_models, main_list)
 
-    all_voltage_matrix, all_current_matrix = communacation_matrix(list_nodes, list_models, main_list)
+    all_voltage_matrix, all_current_matrix, help_voltage_matrix = communacation_matrix(list_nodes, list_models, main_list)
+
+    bus_voltage = []
+    for i in help_voltage_matrix:
+        for j in range(i):
+            bus_voltage.append([])
+    t_bus_voltage = []
 
     time_interrupt = []
     for i in list_models:
@@ -214,7 +228,7 @@ def calculations(list_nodes, list_models, t_max, t_del):
     flag_time_interrupt = [False] * len(time_interrupt)
 
     def f(y, t):
-        global all_voltage_matrix, all_current_matrix
+        global all_voltage_matrix, all_current_matrix, help_voltage_matrix
         wait_index = 0
         current_index = [0, 0]
         ouput_matrix = []
@@ -232,15 +246,16 @@ def calculations(list_nodes, list_models, t_max, t_del):
                 current_interrupt_time_index = i
             else:
                 break
-        if not flag_time_interrupt[current_interrupt_time_index]:
-            for i in range(len(time_interrupt)):
-                flag_time_interrupt[i] = False
-            flag_time_interrupt[current_interrupt_time_index] = True
+        if (len(time_interrupt) != 0):
+            if not flag_time_interrupt[current_interrupt_time_index]:
+                for i in range(len(time_interrupt)):
+                    flag_time_interrupt[i] = False
+                flag_time_interrupt[current_interrupt_time_index] = True
 
-            for i in list_nodes:
-                i.control_connection(list_models)
+                for i in list_nodes:
+                    i.control_connection(list_models)
 
-            all_voltage_matrix, all_current_matrix = communacation_matrix(list_nodes, list_models, main_list)
+                all_voltage_matrix, all_current_matrix, help_voltage_matrix = communacation_matrix(list_nodes, list_models, main_list)
         ###
 
         for type_model, number_moder in main_list:
@@ -273,6 +288,20 @@ def calculations(list_nodes, list_models, t_max, t_del):
 
         solve_matrix = np.linalg.solve(main_det, own_matrix)
 
+        if (len(t_bus_voltage) != 0):
+            if (t_bus_voltage[-1] >= t):
+                for i in range(len(t_bus_voltage)):
+                    if (t_bus_voltage[len(t_bus_voltage) - 1 - i] >= t):
+                        del t_bus_voltage[len(t_bus_voltage) - 1 - i]
+                        for j in range(len(bus_voltage)):
+                            del bus_voltage[j][len(t_bus_voltage) - 1 - i]
+                    else:
+                        break
+
+        t_bus_voltage.append(t)
+        for i in range(len(bus_voltage)):
+            bus_voltage[i].append(solve_matrix[main_det.shape[1] - all_voltage_matrix.shape[1] + i])
+
         wait_index = 0
         qwe_i = 0
         for type_model, number_moder in main_list:
@@ -290,3 +319,5 @@ def calculations(list_nodes, list_models, t_max, t_del):
     results = odeint(f, y0, t)
 
     return_graphs(main_list, list_models, results, t)
+
+    return_voltage_bus(list_nodes, help_voltage_matrix, bus_voltage, t_bus_voltage)

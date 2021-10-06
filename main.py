@@ -4,11 +4,11 @@ import os
 import tkinter.font as font
 
 from BD import update_dictionary
-update_dictionary()
+#update_dictionary()
 
 from Models.Electrical_Bus import Electrical_Bus
 from Models.DWT_YD_11 import DWT_YD_11
-from Models.NPSG_Y import NPSG_Y
+from Models.NPSG_Y_new import NPSG_Y
 from Models.WRIM import WRIM
 from Models.ES import ES
 from Models.SS import SS
@@ -16,6 +16,7 @@ from Models.SL_Y import SL_Y
 from Models.TwSSW_YD_11 import TwSSW_YD_11
 from Models.KZ_3 import KZ_3
 from Models.KZ_1_0 import KZ_1_0
+from Models.KZ_2 import KZ_2
 
 from tree_window import get_tree_window
 from calc import calculations
@@ -43,6 +44,7 @@ def create_lists():
     list_models.append([]) #Трансформатор с расщепенной обмоткой
     list_models.append([]) #Трехфазное короткое замыкание
     list_models.append([]) #Однофазное короткое замыкание на землю
+    list_models.append([]) #Двухфазное короткое замыкание
 
 create_lists()
 
@@ -66,6 +68,8 @@ def add_model(number_model, P1, P2, P3, P4, P5, P6, P7, P8, P9, P10):
         list_models[number_model].append(KZ_3(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10))
     elif (number_model == 8):
         list_models[number_model].append(KZ_1_0(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10))
+    elif (number_model == 9):
+        list_models[number_model].append(KZ_2(P1, P2, P3, P4, P5, P6, P7, P8, P9, P10))
     
 
 #Команды кнопок на экране
@@ -378,7 +382,10 @@ def get_menu(event):
                 menu.post(event.x, event.y)
             else:
                 delete_index = i
-                menu = Menu(tearoff=0, font = ('GOST Type A', 14))         
+                menu = Menu(tearoff=0, font = ('GOST Type A', 14))
+                menu.add_command(label="Посмотреть напряжение",
+                command = list_nodes[i].view_voltage)         
+                menu.add_separator()
                 menu.add_command(label="Удалить узел", 
                 command= delete_nodes)
                 menu.post(event.x, event.y)

@@ -349,16 +349,19 @@ class Base_model:
 
     def view_results(self):
         fig, axs = plt.subplots(len(self.list_graph))
-        plt.subplots_adjust(left=0.04, right=0.96, top = 0.96, bottom= 0.04, hspace=0)
+        plt.subplots_adjust(left=0.06, right=0.96, top = 0.96, bottom= 0.04, hspace=0.15)
         fig.suptitle('Vertically stacked subplots')
         counter_g = 0
         for i in self.list_graph:
             axs[counter_g].plot(self.t, self.list_results[i], linewidth=1, color='red')
+            axs[counter_g].set_ylabel(self.list_text_initial_conditions[i])
             axs[counter_g].grid(True)
             counter_g += 1
-
         plt.show()
 
+        with open('ss.pickle', 'wb') as f:
+            pickle.dump(self.list_results, f)
+            pickle.dump(self.t, f)
 
         #for i in range(math.ceil(len(self.list_results)/4)):
         #    root_graph = Toplevel(self.root)
@@ -623,7 +626,50 @@ class Base_model:
                     self.Loff = 0
             else:
                 if (t - self.switch_time[self.index_current_switch_time] < self.dt):
-                    self.Loff = 0.00002*(1-1/self.dt*(t - self.switch_time[self.index_current_switch_time])) 
+                    self.Loff = 0.002*(1-1/self.dt*(t - self.switch_time[self.index_current_switch_time])) 
                 else:
                     self.Loff = 0
                 self.Roff = 0
+
+    def calc_voltage(self):
+        #Формирование основного определителя СЛУ
+        main_det_v = np.array(self.get_voltage_matrix(self.list_nodes[0]), dtype = self.data_type)
+        if (self.list_nodes != 1):
+            for i in self.list_nodes[1:]:
+                main_det_v = np.hstack((main_det_v, np.array(self.get_voltage_matrix(i), dtype = self.data_type)))
+
+        index_for_delete = []
+        for i in range(self.width_matrix):
+            fl = 0
+            for j in main_det_v[i]:
+                if (j != 0):
+                    fl = 1
+            if (fl == 0):
+                index_for_delete.append(i)
+
+        der_results = []
+
+        for i in range(self.width_matrix):
+            der_results.append(np.diff(self.list_results[i]) / np.diff(self.t))
+
+        der_results = np.array(der_results, dtype = self.data_type)
+        self.result_voltage = []
+
+        for i in range(len(self.t[:-1])):
+            iv = []
+            for j in self.width_input:
+                iv.append(self.list_results[j][i])
+            pwn_m = self.get_own_matrix(iv, self.t[i]) - np.matmul(self.get_main_determinant(iv, self.t[i]), der_results)
+
+            for j in index_for_delete:
+                main_det_v = np.delete(main_det_v, j, axis=0)
+                pwn_m = np.delete(pwn_m, j, axis=0)
+
+            solve_matrix = np.linalg.solve(main_det_v, pwn_m)
+
+            if (len(self.result_voltage) == 0):
+                for j in solve_matrix:
+                    self.result_voltage.append([])
+            
+            for j in range(len(solve_matrix)):
+                self.result_voltage[j].append(solve_matrix[j])
